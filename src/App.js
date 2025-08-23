@@ -1,25 +1,621 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import { ChevronRight, ChevronLeft, ArrowLeft, Package, Zap, Droplet, Car, FileText, DollarSign, Info } from 'lucide-react';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
+const RecyclingCostNavigator = () => {
+  const [currentLevel, setCurrentLevel] = useState('main');
+  const [selectedSection, setSelectedSection] = useState(null);
+  const [selectedSubsection, setSelectedSubsection] = useState(null);
+  const [breadcrumb, setBreadcrumb] = useState([]);
+  const [animationClass, setAnimationClass] = useState('');
+
+  const recyclingData = {
+    "title": "Định mức chi phí tái chế sản phẩm, bao bì",
+    "sections": [
+      {
+        "id": "A",
+        "name": "BAO BÌ",
+        "icon": Package,
+        "color": "from-emerald-500 to-green-600",
+        "description": "Các loại bao bì giấy, kim loại, nhựa, thủy tinh",
+        "subsections": [
+          {
+            "id": "A.1",
+            "name": "Bao bì giấy",
+            "items": [
+              {
+                "name": "Bao bì giấy, carton",
+                "pricing": {
+                  "baseCost": 9500,
+                  "adjustmentFactor": 0.2,
+                  "managementCost": 38.0,
+                  "totalCost": 1938.0
+                }
+              },
+              {
+                "name": "Bao bì giấy hỗn hợp đa lớp (bao bì có thành phần từ 2 loại vật liệu trở lên trong đó có giấy và có ít nhất 3 lớp vật liệu)",
+                "pricing": {
+                  "baseCost": 10700,
+                  "adjustmentFactor": 0.6,
+                  "managementCost": 128.0,
+                  "totalCost": 6548.0
+                }
+              }
+            ]
+          },
+          {
+            "id": "A.2",
+            "name": "Bao bì kim loại",
+            "items": [
+              {
+                "name": "Bao bì nhôm",
+                "pricing": {
+                  "baseCost": 12000,
+                  "adjustmentFactor": 0.2,
+                  "managementCost": 48.0,
+                  "totalCost": 2448.0
+                }
+              },
+              {
+                "name": "Bao bì sắt và kim loại khác",
+                "pricing": {
+                  "baseCost": 9000,
+                  "adjustmentFactor": 0.4,
+                  "managementCost": 72.0,
+                  "totalCost": 3672.0
+                }
+              }
+            ]
+          },
+          {
+            "id": "A.3",
+            "name": "Bao bì nhựa",
+            "items": [
+              {
+                "name": "Bao bì PET cứng",
+                "pricing": {
+                  "baseCost": 9700,
+                  "adjustmentFactor": 0.2,
+                  "managementCost": 39.0,
+                  "totalCost": 1979.0
+                }
+              },
+              {
+                "name": "Bao bì HDPE, LDPE, PP, PS cứng",
+                "pricing": {
+                  "baseCost": 9700,
+                  "adjustmentFactor": 0.4,
+                  "managementCost": 78.0,
+                  "totalCost": 3958.0
+                }
+              },
+              {
+                "name": "Bao bì EPS cứng",
+                "pricing": {
+                  "baseCost": 9700,
+                  "adjustmentFactor": 0.6,
+                  "managementCost": 116.0,
+                  "totalCost": 5936.0
+                }
+              },
+              {
+                "name": "Bao bì PVC cứng",
+                "pricing": {
+                  "baseCost": 9700,
+                  "adjustmentFactor": 0.8,
+                  "managementCost": 155.0,
+                  "totalCost": 7915.0
+                }
+              },
+              {
+                "name": "Bao bì nhựa cứng khác",
+                "pricing": {
+                  "baseCost": 9700,
+                  "adjustmentFactor": 0.6,
+                  "managementCost": 116.0,
+                  "totalCost": 5936.0
+                }
+              },
+              {
+                "name": "Bao bì đơn vật liệu mềm",
+                "pricing": {
+                  "baseCost": 10400,
+                  "adjustmentFactor": 0.8,
+                  "managementCost": 166.0,
+                  "totalCost": 8486.0
+                }
+              },
+              {
+                "name": "Bao bì đa vật liệu mềm",
+                "pricing": {
+                  "baseCost": 10700,
+                  "adjustmentFactor": 1,
+                  "managementCost": 214.0,
+                  "totalCost": 10914.0
+                }
+              }
+            ]
+          },
+          {
+            "id": "A.4",
+            "name": "Bao bì thủy tinh",
+            "items": [
+              {
+                "name": "Bao bì thủy tinh",
+                "pricing": {
+                  "baseCost": 3300,
+                  "adjustmentFactor": 0.6,
+                  "managementCost": 40.0,
+                  "totalCost": 2020.0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "B",
+        "name": "ẮC QUY VÀ PIN",
+        "icon": Zap,
+        "color": "from-amber-500 to-orange-500",
+        "description": "Ắc quy và pin sạc các loại",
+        "subsections": [
+          {
+            "id": "B.1",
+            "name": "Ắc quy",
+            "items": [
+              {
+                "name": "Ắc quy chì",
+                "pricing": {
+                  "baseCost": 44800,
+                  "adjustmentFactor": 0.4,
+                  "managementCost": 358.0,
+                  "totalCost": 18278.0
+                }
+              },
+              {
+                "name": "Ắc quy các loại khác",
+                "pricing": {
+                  "baseCost": 49800,
+                  "adjustmentFactor": 1,
+                  "managementCost": 996.0,
+                  "totalCost": 50796.0
+                }
+              }
+            ]
+          },
+          {
+            "id": "B.2",
+            "name": "Pin sạc (nhiều lần)",
+            "items": [
+              {
+                "name": "Pin sạc nhiều lần các loại",
+                "pricing": {
+                  "baseCost": 53800,
+                  "adjustmentFactor": 1,
+                  "managementCost": 1076.0,
+                  "totalCost": 54876.0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "C",
+        "name": "DẦU NHỚT",
+        "icon": Droplet,
+        "color": "from-blue-500 to-cyan-600",
+        "description": "Dầu nhớt cho động cơ các loại",
+        "subsections": [
+          {
+            "id": "C.1",
+            "name": "Dầu nhớt cho động cơ",
+            "items": [
+              {
+                "name": "Dầu nhớt cho động cơ",
+                "pricing": {
+                  "baseCost": 14000,
+                  "adjustmentFactor": 0.6,
+                  "managementCost": 168.0,
+                  "totalCost": 8568.0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "D",
+        "name": "SĂM, LỐP",
+        "icon": Car,
+        "color": "from-slate-600 to-gray-700",
+        "description": "Săm và lốp xe các loại",
+        "subsections": [
+          {
+            "id": "D.1",
+            "name": "Săm, lốp các loại",
+            "items": [
+              {
+                "name": "Săm, lốp các loại",
+                "pricing": {
+                  "baseCost": 5700,
+                  "adjustmentFactor": 0.6,
+                  "managementCost": 68.0,
+                  "totalCost": 3488.0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Đ",
+        "name": "ĐIỆN – ĐIỆN TỬ",
+        "icon": Zap,
+        "color": "from-teal-500 to-emerald-600",
+        "description": "Thiết bị điện và điện tử",
+        "subsections": [
+          {
+            "id": "Đ.1",
+            "name": "Thiết bị điện tử dân dụng",
+            "items": [
+              {
+                "name": "Tủ lạnh, tủ đông",
+                "pricing": {
+                  "baseCost": 13500,
+                  "adjustmentFactor": 0.6,
+                  "managementCost": 162.0,
+                  "totalCost": 8262.0
+                }
+              },
+              {
+                "name": "Điều hoà không khí",
+                "pricing": {
+                  "baseCost": 14500,
+                  "adjustmentFactor": 0.6,
+                  "managementCost": 174.0,
+                  "totalCost": 8874.0
+                }
+              },
+              {
+                "name": "Bếp điện, bếp từ, bếp hồng ngoại, lò nướng, lò vi sóng",
+                "pricing": {
+                  "baseCost": 12200,
+                  "adjustmentFactor": 0.6,
+                  "managementCost": 146.0,
+                  "totalCost": 7466.0
+                }
+              },
+              {
+                "name": "Máy giặt, máy sấy quần áo",
+                "pricing": {
+                  "baseCost": 12400,
+                  "adjustmentFactor": 0.6,
+                  "managementCost": 149.0,
+                  "totalCost": 7589.0
+                }
+              },
+              {
+                "name": "Loa, âm ly",
+                "pricing": {
+                  "baseCost": 12250,
+                  "adjustmentFactor": 0.8,
+                  "managementCost": 196.0,
+                  "totalCost": 9996.0
+                }
+              }
+            ]
+          },
+          {
+            "id": "Đ.2",
+            "name": "Thiết bị màn hình",
+            "items": [
+              {
+                "name": "Thiết bị màn hình: ti vi, màn hình máy tính để bàn",
+                "pricing": {
+                  "baseCost": 12500,
+                  "adjustmentFactor": 0.8,
+                  "managementCost": 200.0,
+                  "totalCost": 10200.0
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  const handleNavigation = (level, section = null, subsection = null) => {
+    setAnimationClass('slide-out');
+    setTimeout(() => {
+      setCurrentLevel(level);
+      setSelectedSection(section);
+      setSelectedSubsection(subsection);
+      
+      const newBreadcrumb = [];
+      if (level !== 'main') {
+        newBreadcrumb.push({ name: 'Trang chủ', level: 'main' });
+      }
+      if (section) {
+        newBreadcrumb.push({ name: section.name, level: 'section', section });
+      }
+      if (subsection) {
+        newBreadcrumb.push({ name: subsection.name, level: 'subsection', section, subsection });
+      }
+      
+      setBreadcrumb(newBreadcrumb);
+      setAnimationClass('slide-in');
+    }, 150);
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('vi-VN', { 
+      style: 'currency', 
+      currency: 'VND',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
+
+  const renderMainView = () => (
+    <div className={`space-y-6 ${animationClass}`}>
+      <div className="text-center mb-12">
+        <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-emerald-500 to-green-600 rounded-full flex items-center justify-center shadow-lg border-4 border-white relative">
+          <div className="absolute -top-2 -right-2 text-2xl">🌍</div>
+          <FileText className="w-12 h-12 text-white" />
+        </div>
+        <h1 className="text-4xl font-bold text-emerald-900 mb-4 drop-shadow-sm">{recyclingData.title}</h1>
+        <p className="text-emerald-700 max-w-2xl mx-auto text-lg font-medium bg-white/50 backdrop-blur-sm rounded-lg p-4 border border-emerald-100">
+          🌱 Khám phá định mức chi phí tái chế cho các loại sản phẩm và bao bì khác nhau - Vì một môi trường xanh sạch đẹp
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {recyclingData.sections.map((section) => {
+          const IconComponent = section.icon;
+          return (
+            <div
+              key={section.id}
+              onClick={() => handleNavigation('section', section)}
+              className="group cursor-pointer transform transition-all duration-300 hover:scale-105"
+            >
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border border-emerald-100 hover:border-emerald-200">
+                <div className={`h-32 bg-gradient-to-r ${section.color} flex items-center justify-center relative overflow-hidden`}>
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/5 to-white/10"></div>
+                  <IconComponent className="w-16 h-16 text-white z-10 group-hover:scale-110 transition-transform duration-300 drop-shadow-lg" />
+                  <div className="absolute -top-4 -right-4 w-24 h-24 bg-white/20 rounded-full"></div>
+                  <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-white/10 rounded-full"></div>
+                  <div className="absolute top-2 right-2 text-2xl opacity-30">♻️</div>
+                </div>
+                <div className="p-6 bg-gradient-to-b from-white/90 to-emerald-50/50">
+                  <h3 className="text-xl font-bold text-emerald-900 mb-2 group-hover:text-emerald-700 transition-colors">
+                    {section.name}
+                  </h3>
+                  <p className="text-emerald-700 text-sm mb-4 font-medium">{section.description}</p>
+                  <div className="flex items-center text-emerald-600 font-semibold bg-emerald-50 rounded-lg px-3 py-2 group-hover:bg-emerald-100 transition-colors">
+                    <span className="text-sm">🌿 Xem chi tiết</span>
+                    <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
-}
 
-export default App;
+  const renderSectionView = () => (
+    <div className={`space-y-6 ${animationClass}`}>
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-emerald-100 mb-6">
+        <div className="flex items-center mb-6">
+          <div className={`w-16 h-16 bg-gradient-to-r ${selectedSection.color} rounded-xl flex items-center justify-center mr-6 shadow-lg`}>
+            <selectedSection.icon className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-emerald-900">{selectedSection.name}</h1>
+            <p className="text-emerald-700 mt-2 font-medium">🌱 {selectedSection.description}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {selectedSection.subsections.map((subsection) => (
+          <div
+            key={subsection.id}
+            onClick={() => handleNavigation('subsection', selectedSection, subsection)}
+            className="group cursor-pointer transform transition-all duration-300 hover:scale-105"
+          >
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6 border border-emerald-100 hover:border-emerald-200">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold text-emerald-900 group-hover:text-emerald-700 transition-colors">
+                  {subsection.name}
+                </h3>
+                <ChevronRight className="w-5 h-5 text-emerald-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" />
+              </div>
+              <div className="text-sm text-emerald-700">
+                <div className="flex items-center bg-emerald-50 rounded-lg px-3 py-2">
+                  <Info className="w-4 h-4 mr-2 text-emerald-600" />
+                  <span className="font-medium">♻️ {subsection.items.length} sản phẩm</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderSubsectionView = () => (
+    <div className={`space-y-6 ${animationClass}`}>
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-emerald-100 mb-6">
+        <h1 className="text-3xl font-bold text-emerald-900 mb-2">♻️ {selectedSubsection.name}</h1>
+        <p className="text-emerald-700 font-medium">🌿 Chi tiết định mức chi phí tái chế</p>
+      </div>
+
+      <div className="space-y-4">
+        {selectedSubsection.items.map((item, index) => (
+          <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-emerald-100 overflow-hidden hover:shadow-2xl transition-all duration-300">
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-emerald-900 mb-6 flex items-center">
+                <span className="mr-2">🌱</span>
+                {item.name}
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-gradient-to-br from-emerald-50 to-green-100 rounded-lg p-4 border border-emerald-200">
+                  <div className="flex items-center mb-2">
+                    <DollarSign className="w-5 h-5 text-emerald-600 mr-2" />
+                    <span className="text-sm font-medium text-emerald-700">Chi phí cơ sở</span>
+                  </div>
+                  <p className="text-2xl font-bold text-emerald-800">
+                    {formatCurrency(item.pricing.baseCost)}
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-br from-amber-50 to-yellow-100 rounded-lg p-4 border border-amber-200">
+                  <div className="flex items-center mb-2">
+                    <span className="w-5 h-5 bg-amber-600 rounded-full mr-2 flex items-center justify-center text-xs text-white font-bold">%</span>
+                    <span className="text-sm font-medium text-amber-700">Hệ số điều chỉnh</span>
+                  </div>
+                  <p className="text-2xl font-bold text-amber-800">
+                    {(item.pricing.adjustmentFactor * 100).toFixed(0)}%
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-br from-cyan-50 to-blue-100 rounded-lg p-4 border border-cyan-200">
+                  <div className="flex items-center mb-2">
+                    <DollarSign className="w-5 h-5 text-cyan-600 mr-2" />
+                    <span className="text-sm font-medium text-cyan-700">Chi phí quản lý</span>
+                  </div>
+                  <p className="text-2xl font-bold text-cyan-800">
+                    {formatCurrency(item.pricing.managementCost)}
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-br from-teal-50 to-emerald-100 rounded-lg p-4 border-2 border-teal-300 relative overflow-hidden">
+                  <div className="absolute top-1 right-1 text-lg opacity-30">🌟</div>
+                  <div className="flex items-center mb-2">
+                    <DollarSign className="w-5 h-5 text-teal-600 mr-2" />
+                    <span className="text-sm font-medium text-teal-700">Tổng chi phí</span>
+                  </div>
+                  <p className="text-2xl font-bold text-teal-800">
+                    {formatCurrency(item.pricing.totalCost)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderBreadcrumb = () => {
+    if (breadcrumb.length === 0) return null;
+
+    return (
+      <div className="flex items-center space-x-2 mb-6 text-sm">
+        {breadcrumb.map((item, index) => (
+          <React.Fragment key={index}>
+            <button
+              onClick={() => {
+                if (item.level === 'main') handleNavigation('main');
+                else if (item.level === 'section') handleNavigation('section', item.section);
+                else if (item.level === 'subsection') handleNavigation('subsection', item.section, item.subsection);
+              }}
+              className="text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              {item.name}
+            </button>
+            {index < breadcrumb.length - 1 && (
+              <ChevronRight className="w-4 h-4 text-emerald-400" />
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+    );
+  };
+
+  const renderBackButton = () => {
+    if (currentLevel === 'main') return null;
+
+    return (
+      <button
+        onClick={() => {
+          if (currentLevel === 'subsection') {
+            handleNavigation('section', selectedSection);
+          } else if (currentLevel === 'section') {
+            handleNavigation('main');
+          }
+        }}
+        className="flex items-center text-emerald-700 hover:text-emerald-900 transition-colors mb-6 group bg-white/70 backdrop-blur-sm rounded-lg px-4 py-2 border border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 shadow-sm"
+      >
+        <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
+        <span className="font-medium">🌿 Quay lại</span>
+      </button>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 relative overflow-hidden">
+      {/* Environmental Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-green-200 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute top-1/3 -left-32 w-64 h-64 bg-emerald-300 rounded-full opacity-15"></div>
+        <div className="absolute bottom-20 right-1/4 w-48 h-48 bg-teal-200 rounded-full opacity-10"></div>
+        <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-lime-200 rounded-full opacity-20"></div>
+        
+        {/* Leaf patterns */}
+        <div className="absolute top-20 left-10 text-green-200 opacity-30 text-6xl">🍃</div>
+        <div className="absolute bottom-40 right-20 text-emerald-200 opacity-25 text-4xl">🌿</div>
+        <div className="absolute top-1/2 right-10 text-green-300 opacity-20 text-5xl">🌱</div>
+        <div className="absolute bottom-20 left-1/4 text-teal-200 opacity-30 text-3xl">♻️</div>
+      </div>
+      
+      <div className="container mx-auto px-4 py-8 max-w-7xl relative z-10">
+        {renderBackButton()}
+        {renderBreadcrumb()}
+        
+        {currentLevel === 'main' && renderMainView()}
+        {currentLevel === 'section' && renderSectionView()}
+        {currentLevel === 'subsection' && renderSubsectionView()}
+      </div>
+      
+      <style jsx>{`
+        .slide-in {
+          animation: slideIn 0.3s ease-out forwards;
+        }
+        
+        .slide-out {
+          animation: slideOut 0.15s ease-in forwards;
+        }
+        
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes slideOut {
+          from {
+            opacity: 1;
+            transform: translateY(0);
+          }
+          to {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default RecyclingCostNavigator;
