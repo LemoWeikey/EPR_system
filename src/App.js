@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronRight, ChevronLeft, ArrowLeft, Package, Zap, Droplet, Car, FileText, DollarSign, Info } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronRight, ArrowLeft, Package, Zap, Droplet, Car, FileText, DollarSign, Info } from 'lucide-react';
 
 const RecyclingCostNavigator = () => {
   const [currentLevel, setCurrentLevel] = useState('main');
