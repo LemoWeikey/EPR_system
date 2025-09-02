@@ -13,17 +13,17 @@ const RecyclingCostNavigator = () => {
     "sections": [
       {
         "id": "A",
-        "name": "BAO BÌ",
+        "name": "A-BAO BÌ",
         "icon": Package,
         "color": "from-emerald-500 to-green-600",
-        "description": "Các loại bao bì giấy, kim loại, nhựa, thủy tinh",
+        "description": "A-Các loại bao bì giấy, kim loại, nhựa, thủy tinh",
         "subsections": [
           {
             "id": "A.1",
-            "name": "Bao bì giấy",
+            "name": "A.1-Bao bì giấy",
             "items": [
               {
-                "name": "Bao bì giấy, carton",
+                "name": "A.1.1-Bao bì giấy, carton",
                 "pricing": {
                   "baseCost": 9500,
                   "adjustmentFactor": 0.2,
@@ -32,7 +32,7 @@ const RecyclingCostNavigator = () => {
                 }
               },
               {
-                "name": "Bao bì giấy hỗn hợp đa lớp (bao bì có thành phần từ 2 loại vật liệu trở lên trong đó có giấy và có ít nhất 3 lớp vật liệu)",
+                "name": "A.1.2-Bao bì giấy hỗn hợp đa lớp (bao bì có thành phần từ 2 loại vật liệu trở lên trong đó có giấy và có ít nhất 3 lớp vật liệu)",
                 "pricing": {
                   "baseCost": 10700,
                   "adjustmentFactor": 0.6,
@@ -44,10 +44,10 @@ const RecyclingCostNavigator = () => {
           },
           {
             "id": "A.2",
-            "name": "Bao bì kim loại",
+            "name": "A.2-Bao bì kim loại",
             "items": [
               {
-                "name": "Bao bì nhôm",
+                "name": "A.2.1-Bao bì nhôm",
                 "pricing": {
                   "baseCost": 12000,
                   "adjustmentFactor": 0.2,
@@ -56,7 +56,7 @@ const RecyclingCostNavigator = () => {
                 }
               },
               {
-                "name": "Bao bì sắt và kim loại khác",
+                "name": "A.2.2-Bao bì sắt và kim loại khác",
                 "pricing": {
                   "baseCost": 9000,
                   "adjustmentFactor": 0.4,
@@ -68,10 +68,10 @@ const RecyclingCostNavigator = () => {
           },
           {
             "id": "A.3",
-            "name": "Bao bì nhựa",
+            "name": "A.3-Bao bì nhựa",
             "items": [
               {
-                "name": "Bao bì PET cứng",
+                "name": "A.3.1-Bao bì PET cứng",
                 "pricing": {
                   "baseCost": 9700,
                   "adjustmentFactor": 0.2,
@@ -80,7 +80,7 @@ const RecyclingCostNavigator = () => {
                 }
               },
               {
-                "name": "Bao bì HDPE, LDPE, PP, PS cứng",
+                "name": "A.3.2-Bao bì HDPE, LDPE, PP, PS cứng",
                 "pricing": {
                   "baseCost": 9700,
                   "adjustmentFactor": 0.4,
@@ -89,7 +89,7 @@ const RecyclingCostNavigator = () => {
                 }
               },
               {
-                "name": "Bao bì EPS cứng",
+                "name": "A.3.3-Bao bì EPS cứng",
                 "pricing": {
                   "baseCost": 9700,
                   "adjustmentFactor": 0.6,
@@ -98,7 +98,7 @@ const RecyclingCostNavigator = () => {
                 }
               },
               {
-                "name": "Bao bì PVC cứng",
+                "name": "A.3.5-Bao bì PVC cứng",
                 "pricing": {
                   "baseCost": 9700,
                   "adjustmentFactor": 0.8,
@@ -107,16 +107,7 @@ const RecyclingCostNavigator = () => {
                 }
               },
               {
-                "name": "Bao bì nhựa cứng khác",
-                "pricing": {
-                  "baseCost": 9700,
-                  "adjustmentFactor": 0.6,
-                  "managementCost": 116.0,
-                  "totalCost": 5936.0
-                }
-              },
-              {
-                "name": "Bao bì đơn vật liệu mềm",
+                "name": "A.3.4a-Bao bì đơn vật liệu mềm",
                 "pricing": {
                   "baseCost": 10400,
                   "adjustmentFactor": 0.8,
@@ -125,7 +116,7 @@ const RecyclingCostNavigator = () => {
                 }
               },
               {
-                "name": "Bao bì đa vật liệu mềm",
+                "name": "A.3.4b-Bao bì đa vật liệu mềm",
                 "pricing": {
                   "baseCost": 10700,
                   "adjustmentFactor": 1,
@@ -137,10 +128,10 @@ const RecyclingCostNavigator = () => {
           },
           {
             "id": "A.4",
-            "name": "Bao bì thủy tinh",
+            "name": "A.4-Bao bì thủy tinh",
             "items": [
               {
-                "name": "Bao bì thủy tinh",
+                "name": "A.4.1-Bao bì thủy tinh",
                 "pricing": {
                   "baseCost": 3300,
                   "adjustmentFactor": 0.6,
@@ -154,17 +145,17 @@ const RecyclingCostNavigator = () => {
       },
       {
         "id": "B",
-        "name": "ẮC QUY VÀ PIN",
+        "name": "B-ẮC QUY VÀ PIN",
         "icon": Zap,
         "color": "from-amber-500 to-orange-500",
         "description": "Ắc quy và pin sạc các loại",
         "subsections": [
           {
             "id": "B.1",
-            "name": "Ắc quy",
+            "name": "B.1-Ắc quy",
             "items": [
               {
-                "name": "Ắc quy chì",
+                "name": "B.1.1-Ắc quy chì",
                 "pricing": {
                   "baseCost": 44800,
                   "adjustmentFactor": 0.4,
@@ -173,7 +164,7 @@ const RecyclingCostNavigator = () => {
                 }
               },
               {
-                "name": "Ắc quy các loại khác",
+                "name": "B.1.2-Ắc quy các loại khác",
                 "pricing": {
                   "baseCost": 49800,
                   "adjustmentFactor": 1,
@@ -185,10 +176,10 @@ const RecyclingCostNavigator = () => {
           },
           {
             "id": "B.2",
-            "name": "Pin sạc (nhiều lần)",
+            "name": "B.2-Pin sạc (nhiều lần)",
             "items": [
               {
-                "name": "Pin sạc nhiều lần các loại",
+                "name": "B.2.1-Pin sạc nhiều lần các loại",
                 "pricing": {
                   "baseCost": 53800,
                   "adjustmentFactor": 1,
@@ -202,17 +193,17 @@ const RecyclingCostNavigator = () => {
       },
       {
         "id": "C",
-        "name": "DẦU NHỚT",
+        "name": "C-DẦU NHỚT",
         "icon": Droplet,
         "color": "from-blue-500 to-cyan-600",
         "description": "Dầu nhớt cho động cơ các loại",
         "subsections": [
           {
             "id": "C.1",
-            "name": "Dầu nhớt cho động cơ",
+            "name": "C.1-Dầu nhớt cho động cơ",
             "items": [
               {
-                "name": "Dầu nhớt cho động cơ",
+                "name": "C.1.1-Dầu nhớt cho động cơ",
                 "pricing": {
                   "baseCost": 14000,
                   "adjustmentFactor": 0.6,
@@ -226,17 +217,17 @@ const RecyclingCostNavigator = () => {
       },
       {
         "id": "D",
-        "name": "SĂM, LỐP",
+        "name": "D-SĂM, LỐP",
         "icon": Car,
         "color": "from-slate-600 to-gray-700",
         "description": "Săm và lốp xe các loại",
         "subsections": [
           {
             "id": "D.1",
-            "name": "Săm, lốp các loại",
+            "name": "D.1-Săm, lốp các loại",
             "items": [
               {
-                "name": "Săm, lốp các loại",
+                "name": "D.1.1-Săm, lốp các loại",
                 "pricing": {
                   "baseCost": 5700,
                   "adjustmentFactor": 0.6,
@@ -250,17 +241,17 @@ const RecyclingCostNavigator = () => {
       },
       {
         "id": "Đ",
-        "name": "ĐIỆN – ĐIỆN TỬ",
+        "name": "Đ-ĐIỆN – ĐIỆN TỬ",
         "icon": Zap,
         "color": "from-teal-500 to-emerald-600",
         "description": "Thiết bị điện và điện tử",
         "subsections": [
           {
             "id": "Đ.1",
-            "name": "Thiết bị điện tử dân dụng",
+            "name": "Đ.1-Thiết bị điện tử dân dụng",
             "items": [
               {
-                "name": "Tủ lạnh, tủ đông",
+                "name": "Đ.1.1-Tủ lạnh, tủ đông",
                 "pricing": {
                   "baseCost": 13500,
                   "adjustmentFactor": 0.6,
@@ -269,7 +260,7 @@ const RecyclingCostNavigator = () => {
                 }
               },
               {
-                "name": "Điều hoà không khí",
+                "name": "Đ.1.2-Điều hoà không khí",
                 "pricing": {
                   "baseCost": 14500,
                   "adjustmentFactor": 0.6,
@@ -278,7 +269,7 @@ const RecyclingCostNavigator = () => {
                 }
               },
               {
-                "name": "Bếp điện, bếp từ, bếp hồng ngoại, lò nướng, lò vi sóng",
+                "name": "Đ.1.3-Bếp điện, bếp từ, bếp hồng ngoại, lò nướng, lò vi sóng",
                 "pricing": {
                   "baseCost": 12200,
                   "adjustmentFactor": 0.6,
@@ -287,7 +278,7 @@ const RecyclingCostNavigator = () => {
                 }
               },
               {
-                "name": "Máy giặt, máy sấy quần áo",
+                "name": "Đ.1.4-Máy giặt, máy sấy quần áo",
                 "pricing": {
                   "baseCost": 12400,
                   "adjustmentFactor": 0.6,
@@ -296,7 +287,7 @@ const RecyclingCostNavigator = () => {
                 }
               },
               {
-                "name": "Loa, âm ly",
+                "name": "Đ.1.5-Loa, âm ly",
                 "pricing": {
                   "baseCost": 12250,
                   "adjustmentFactor": 0.8,
@@ -308,10 +299,10 @@ const RecyclingCostNavigator = () => {
           },
           {
             "id": "Đ.2",
-            "name": "Thiết bị màn hình",
+            "name": "Đ.2-Thiết bị màn hình",
             "items": [
               {
-                "name": "Thiết bị màn hình: ti vi, màn hình máy tính để bàn",
+                "name": "Đ.2.1-Thiết bị màn hình: ti vi, màn hình máy tính để bàn",
                 "pricing": {
                   "baseCost": 12500,
                   "adjustmentFactor": 0.8,
