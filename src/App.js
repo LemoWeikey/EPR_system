@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ChevronRight, ArrowLeft, Package, Zap, Droplet, Car, FileText, DollarSign, Info, CheckCircle, Send, X, Plus } from 'lucide-react';
+import { ChevronRight, ArrowLeft, Package, Zap, Droplet, Car, FileText, DollarSign, Info, CheckCircle, Send, X, Plus, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 const RecyclingCostNavigator = () => {
   const [currentLevel, setCurrentLevel] = useState('main');
@@ -440,6 +441,61 @@ const RecyclingCostNavigator = () => {
 
   const getTotalCost = () => {
     return Object.values(declaredItems).reduce((sum, item) => sum + item.totalCost, 0);
+  };
+
+  const exportToExcel = () => {
+    // Prepare data for Excel
+    const excelData = Object.entries(declaredItems).map(([key, data], index) => ({
+      'STT': index + 1,
+      'Tên sản phẩm': data.productData.productName,
+      'Phân loại': `${data.section.name} → ${data.subsection.name}`,
+      'Đơn vị tính': data.productData.unit,
+      'Khối lượng (kg)': parseFloat(data.productData.weight),
+      'Số lượng': parseFloat(data.productData.quantity),
+      'Đơn giá (VND)': data.item.pricing.totalCost,
+      'Doanh thu trong nước (VND)': data.productData.domesticRevenue ? parseFloat(data.productData.domesticRevenue) : 0,
+      'Thành tiền (VND)': data.totalCost
+    }));
+
+    // Add summary row
+    excelData.push({
+      'STT': '',
+      'Tên sản phẩm': '',
+      'Phân loại': '',
+      'Đơn vị tính': '',
+      'Khối lượng (kg)': '',
+      'Số lượng': '',
+      'Đơn giá (VND)': '',
+      'Doanh thu trong nước (VND)': 'TỔNG CỘNG:',
+      'Thành tiền (VND)': getTotalCost()
+    });
+
+    // Create worksheet
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+
+    // Set column widths
+    worksheet['!cols'] = [
+      { wch: 5 },  // STT
+      { wch: 40 }, // Tên sản phẩm
+      { wch: 35 }, // Phân loại
+      { wch: 12 }, // Đơn vị tính
+      { wch: 15 }, // Khối lượng
+      { wch: 12 }, // Số lượng
+      { wch: 15 }, // Đơn giá
+      { wch: 25 }, // Doanh thu
+      { wch: 18 }  // Thành tiền
+    ];
+
+    // Create workbook
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Báo cáo tái chế');
+
+    // Generate filename with current date
+    const date = new Date();
+    const filename = `Bao_cao_tai_che_${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}.xlsx`;
+
+    // Save file
+    XLSX.writeFile(workbook, filename);
   };
 
   const isItemDeclared = (item) => {
@@ -1060,12 +1116,13 @@ const RecyclingCostNavigator = () => {
                 <div className="flex justify-center mt-8">
                   <button
                     onClick={() => {
+                      exportToExcel();
                       alert('Đã gửi thành công! 🌱 Cảm ơn bạn đã quan tâm đến môi trường.');
                       setShowSummary(false);
                     }}
                     className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-300 transform hover:scale-105"
                   >
-                    <Send className="w-6 h-6 mr-3 inline" />
+                    <Download className="w-6 h-6 mr-3 inline" />
                     🌍 Gửi báo cáo tái chế
                   </button>
                 </div>
