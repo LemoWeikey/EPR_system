@@ -3,13 +3,12 @@ import { ChevronRight, ArrowLeft, Package, Zap, Droplet, Car, FileText, DollarSi
 import * as XLSX from 'xlsx';
 
 const RecyclingCostNavigator = () => {
-  const [currentPage, setCurrentPage] = useState('landing'); // 'landing', 'home' or 'catalog'
+  const [currentPage, setCurrentPage] = useState('landing');
   const [selectedSection, setSelectedSection] = useState(null);
   const [selectedSubsection, setSelectedSubsection] = useState(null);
   const [breadcrumb, setBreadcrumb] = useState([]);
   const [animationClass, setAnimationClass] = useState('');
   
-  // Main product declaration state
   const [mainProducts, setMainProducts] = useState([]);
   const [currentMainProduct, setCurrentMainProduct] = useState({
     productName: '',
@@ -20,7 +19,6 @@ const RecyclingCostNavigator = () => {
   const [editingMainProductIndex, setEditingMainProductIndex] = useState(null);
   const [showMainProductForm, setShowMainProductForm] = useState(false);
   
-  // Sub-items (packaging items) state
   const [subItems, setSubItems] = useState({});
   const [showSubItemForm, setShowSubItemForm] = useState(false);
   const [currentSubItem, setCurrentSubItem] = useState(null);
@@ -510,8 +508,9 @@ const RecyclingCostNavigator = () => {
     const specification = parseFloat(subItem.specification) || 0;
     const weight = parseFloat(subItem.weight) || 0;
     const totalCost = subItem.catalogItem.pricing.totalCost;
+    const adjustmentFactor = subItem.catalogItem.pricing.adjustmentFactor;
     
-    return quantity * specification * weight * totalCost;
+    return quantity * specification * weight * totalCost * adjustmentFactor;
   };
 
   const getTotalSubItemsCount = () => {
@@ -543,7 +542,7 @@ const RecyclingCostNavigator = () => {
             'Doanh thu trong nước (VND)': mainProduct.domesticRevenue ? parseFloat(mainProduct.domesticRevenue) : 0,
             'Số lượng': parseFloat(mainProduct.quantity),
             'Tên bao bì': subItem.productName,
-            'Mã định mức': subItem.catalogItem.name,
+            'Mã định mức': subItem.catalogItem.name.replace('-', '. '),
             'Bao bì': subItem.packagingType === 'direct' ? 'Bao bì trực tiếp' : 'Bao bì ngoài',
             'Quy Cách': parseFloat(subItem.specification) || 0,
             'Khối lượng (kg)': parseFloat(subItem.weight),
@@ -599,7 +598,6 @@ const RecyclingCostNavigator = () => {
   
     mainProducts.forEach((mainProduct, mainIndex) => {
       if (subItems[mainIndex] && subItems[mainIndex].length > 0) {
-        // Add main product row (use original unit from mainProduct, converted to lowercase)
         transformedData.push({
           'TT': String(counter),
           'Danh mục sản phẩm, hàng hóa': mainProduct.productName.trim(),
@@ -608,14 +606,13 @@ const RecyclingCostNavigator = () => {
           'Quy cách đóng gói': '',
           'Khối lượng / 1 đơn vị SP (Kg)': '',
           'Số lượng': parseFloat(mainProduct.quantity),
-          'Doanh thu trong nước': mainProduct.domesticRevenue ? parseFloat(mainProduct.domesticRevenue) : ''
+          'Doanh thu trong nước': mainProduct.domesticRevenue ? parseFloat(mainProduct.domesticRevenue) : 0
         });
   
-        // Add sub-product rows (packaging items)
         subItems[mainIndex].forEach((subItem, subIndex) => {
           transformedData.push({
             'TT': `${counter}.${subIndex + 1}`,
-            'Danh mục sản phẩm, hàng hóa': subItem.catalogItem.name,
+            'Danh mục sản phẩm, hàng hóa': subItem.catalogItem.name.replace('-', '. '),
             'Đơn vị tính': 'kg',
             'Bao bì': subItem.packagingType === 'direct' ? 'Bao bì trực tiếp' : 'Bao bì ngoài',
             'Quy cách đóng gói': parseFloat(subItem.specification) || '',
@@ -659,7 +656,6 @@ const RecyclingCostNavigator = () => {
             <button
               onClick={() => {
                 if (item.level === 'catalog' && !selectedSection) {
-                  // Already at catalog root
                 } else if (item.level === 'catalog') {
                   handleBackFromCatalog();
                 } else if (item.level === 'section') {
@@ -688,7 +684,6 @@ const RecyclingCostNavigator = () => {
       </div>
       
       <div className="container mx-auto px-4 py-8 max-w-7xl relative z-10">
-        {/* LANDING PAGE */}
         {currentPage === 'landing' && (
           <div className="min-h-screen flex items-center justify-center">
             <div className="text-center max-w-4xl mx-auto">
@@ -721,781 +716,778 @@ const RecyclingCostNavigator = () => {
                     <DollarSign className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-emerald-900 mb-2">Tính toán chính xác</h3>
-                  <p className="text-emerald-700">Áp dụng đúng định mức chi phí theo quy định
-                  </p>
+                  <p className="text-emerald-700">Áp dụng đúng định mức chi phí theo quy định</p>
                 </div>
+                
                 <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-emerald-100 transform hover:scale-105 transition-all duration-300">
-              <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-teal-500 to-emerald-600 rounded-full flex items-center justify-center">
-                <Download className="w-8 h-8 text-white" />
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-teal-500 to-emerald-600 rounded-full flex items-center justify-center">
+                    <Download className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-emerald-900 mb-2">Xuất báo cáo nhanh</h3>
+                  <p className="text-emerald-700">Tạo file Excel chi tiết chỉ trong một cú click</p>
+                </div>
               </div>
-              <h3 className="text-xl font-bold text-emerald-900 mb-2">Xuất báo cáo nhanh</h3>
-              <p className="text-emerald-700">Tạo file Excel chi tiết chỉ trong một cú click</p>
+
+              <button
+                onClick={() => setCurrentPage('home')}
+                className="group bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-12 py-5 rounded-2xl font-bold text-xl shadow-2xl transition-all duration-300 transform hover:scale-110 hover:shadow-emerald-500/50"
+              >
+                <span className="flex items-center justify-center">
+                  Bắt đầu ngay
+                  <ChevronRight className="w-6 h-6 ml-2 group-hover:translate-x-2 transition-transform" />
+                </span>
+              </button>
+
+              <div className="mt-12 text-emerald-600 text-sm">
+                <p>Hỗ trợ đầy đủ các loại bao bì: Giấy, Kim loại, Nhựa, Thủy tinh</p>
+                <p className="mt-2">Áp dụng theo Thông tư 02/2022/TT-BTNMT</p>
+              </div>
             </div>
           </div>
+        )}
 
-          <button
-            onClick={() => setCurrentPage('home')}
-            className="group bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-12 py-5 rounded-2xl font-bold text-xl shadow-2xl transition-all duration-300 transform hover:scale-110 hover:shadow-emerald-500/50"
-          >
-            <span className="flex items-center justify-center">
-              Bắt đầu ngay
-              <ChevronRight className="w-6 h-6 ml-2 group-hover:translate-x-2 transition-transform" />
-            </span>
-          </button>
+        {currentPage === 'home' && (
+          <div className={`space-y-6 ${animationClass}`}>
+            <div className="text-center mb-12">
+              <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-emerald-500 to-green-600 rounded-full flex items-center justify-center shadow-lg border-4 border-white">
+                <FileText className="w-12 h-12 text-white" />
+              </div>
+              <h1 className="text-4xl font-bold text-emerald-900 mb-4">{recyclingData.title}</h1>
+              <p className="text-emerald-700 max-w-2xl mx-auto text-lg font-medium bg-white/50 backdrop-blur-sm rounded-lg p-4 border border-emerald-100">
+                Khám phá định mức chi phí tái chế cho các loại sản phẩm và bao bì khác nhau
+              </p>
+              
+              <div className="flex justify-center space-x-4 mt-8">
+                <button
+                  onClick={openMainProductForm}
+                  className="flex items-center bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
+                >
+                  <Plus className="w-5 h-5 mr-2" />
+                  Khai báo
+                </button>
+                
+                <button
+                  onClick={() => setShowDeclaredItems(true)}
+                  className="flex items-center bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
+                >
+                  <CheckCircle className="w-5 h-5 mr-2" />
+                  Kiểm tra đã khai báo ({getTotalSubItemsCount()})
+                </button>
+                
+                <button
+                  onClick={() => setShowSummary(true)}
+                  disabled={getTotalSubItemsCount() === 0}
+                  className={`flex items-center px-6 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105 ${
+                    getTotalSubItemsCount() > 0 
+                      ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white' 
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  <Send className="w-5 h-5 mr-2" />
+                  Gửi ({getTotalSubItemsCount()} items)
+                </button>
+              </div>
+            </div>
 
-          <div className="mt-12 text-emerald-600 text-sm">
-            <p>Hỗ trợ đầy đủ các loại bao bì: Giấy, Kim loại, Nhựa, Thủy tinh</p>
-            <p className="mt-2">Áp dụng theo Thông tư 02/2022/TT-BTNMT</p>
-          </div>
-        </div>
-      </div>
-    )}
-
-    {/* HOME PAGE */}
-    {currentPage === 'home' && (
-      <div className={`space-y-6 ${animationClass}`}>
-        <div className="text-center mb-12">
-          <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-emerald-500 to-green-600 rounded-full flex items-center justify-center shadow-lg border-4 border-white">
-            <FileText className="w-12 h-12 text-white" />
-          </div>
-          <h1 className="text-4xl font-bold text-emerald-900 mb-4">{recyclingData.title}</h1>
-          <p className="text-emerald-700 max-w-2xl mx-auto text-lg font-medium bg-white/50 backdrop-blur-sm rounded-lg p-4 border border-emerald-100">
-            Khám phá định mức chi phí tái chế cho các loại sản phẩm và bao bì khác nhau
-          </p>
-          
-          <div className="flex justify-center space-x-4 mt-8">
-            <button
-              onClick={openMainProductForm}
-              className="flex items-center bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Khai báo
-            </button>
-            
-            <button
-              onClick={() => setShowDeclaredItems(true)}
-              className="flex items-center bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
-            >
-              <CheckCircle className="w-5 h-5 mr-2" />
-              Kiểm tra đã khai báo ({getTotalSubItemsCount()})
-            </button>
-            
-            <button
-              onClick={() => setShowSummary(true)}
-              disabled={getTotalSubItemsCount() === 0}
-              className={`flex items-center px-6 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105 ${
-                getTotalSubItemsCount() > 0 
-                  ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white' 
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-            >
-              <Send className="w-5 h-5 mr-2" />
-              Gửi ({getTotalSubItemsCount()} items)
-            </button>
-          </div>
-        </div>
-
-        {/* Main Products List */}
-        {mainProducts.length > 0 && (
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-emerald-100">
-            <h2 className="text-2xl font-bold text-emerald-900 mb-4">Danh sách sản phẩm đã khai báo</h2>
-            <div className="space-y-4">
-              {mainProducts.map((product, index) => (
-                <div key={index} className="bg-emerald-50/50 rounded-lg p-4 border border-emerald-200">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-emerald-900">{product.productName}</h3>
-                      <div className="grid grid-cols-3 gap-4 mt-2 text-sm text-emerald-700">
-                        <div><span className="font-medium">Đơn vị:</span> {product.unit}</div>
-                        <div><span className="font-medium">Số lượng:</span> {product.quantity}</div>
-                        <div><span className="font-medium">Doanh thu:</span> {product.domesticRevenue ? formatCurrency(product.domesticRevenue) : '-'}</div>
-                      </div>
-                      {subItems[index] && subItems[index].length > 0 && (
-                        <div className="mt-3 text-sm text-emerald-600">
-                          <span className="font-medium">{subItems[index].length} bao bì đã khai báo</span>
+            {mainProducts.length > 0 && (
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-emerald-100">
+                <h2 className="text-2xl font-bold text-emerald-900 mb-4">Danh sách sản phẩm đã khai báo</h2>
+                <div className="space-y-4">
+                  {mainProducts.map((product, index) => (
+                    <div key={index} className="bg-emerald-50/50 rounded-lg p-4 border border-emerald-200">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-emerald-900">{product.productName}</h3>
+                          <div className="grid grid-cols-3 gap-4 mt-2 text-sm text-emerald-700">
+                            <div><span className="font-medium">Đơn vị:</span> {product.unit}</div>
+                            <div><span className="font-medium">Số lượng:</span> {product.quantity}</div>
+                            <div><span className="font-medium">Doanh thu:</span> {product.domesticRevenue ? formatCurrency(product.domesticRevenue) : '-'}</div>
+                          </div>
+                          {subItems[index] && subItems[index].length > 0 && (
+                            <div className="mt-3 text-sm text-emerald-600">
+                              <span className="font-medium">{subItems[index].length} bao bì đã khai báo</span>
+                            </div>
+                          )}
                         </div>
-                      )}
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => openCatalog(index)}
+                            className="bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white px-4 py-2 rounded-lg font-semibold transition-all"
+                          >
+                            Danh mục bao bì
+                          </button>
+                          <button
+                            onClick={() => deleteMainProduct(index)}
+                            className="text-red-500 hover:text-red-700 transition-colors"
+                          >
+                            <X className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => openCatalog(index)}
-                        className="bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white px-4 py-2 rounded-lg font-semibold transition-all"
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {currentPage === 'catalog' && (
+          <div className={`space-y-6 ${animationClass}`}>
+            <div className="flex justify-between items-center mb-6">
+              <button
+                onClick={handleBackFromCatalog}
+                className="flex items-center text-emerald-700 hover:text-emerald-900 transition-colors group bg-white/70 backdrop-blur-sm rounded-lg px-4 py-2 border border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 shadow-sm"
+              >
+                <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
+                <span className="font-medium">Quay lại</span>
+              </button>
+              
+              {(selectedSection || selectedSubsection) && (
+                <button
+                  onClick={() => setCurrentPage('home')}
+                  className="flex items-center text-white bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 transition-all px-4 py-2 rounded-lg shadow-lg font-semibold"
+                >
+                  <FileText className="w-5 h-5 mr-2" />
+                  <span>Về trang chủ</span>
+                </button>
+              )}
+            </div>
+            
+            {renderBreadcrumb()}
+
+            {!selectedSection && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <h1 className="text-3xl font-bold text-emerald-900 mb-4">Danh mục bao bì</h1>
+                  {currentMainProductIndex !== null && (
+                    <p className="text-emerald-700 font-medium">
+                      Đang khai báo cho: <span className="font-bold">{mainProducts[currentMainProductIndex].productName}</span>
+                    </p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {recyclingData.sections.map((section) => {
+                    const IconComponent = section.icon;
+                    return (
+                      <div
+                        key={section.id}
+                        onClick={() => handleSectionClick(section)}
+                        className="group cursor-pointer transform transition-all duration-300 hover:scale-105"
                       >
-                        Danh mục bao bì
-                      </button>
+                        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border border-emerald-100 hover:border-emerald-200">
+                          <div className={`h-32 bg-gradient-to-r ${section.color} flex items-center justify-center`}>
+                            <IconComponent className="w-16 h-16 text-white z-10 group-hover:scale-110 transition-transform duration-300 drop-shadow-lg" />
+                          </div>
+                          <div className="p-6">
+                            <h3 className="text-xl font-bold text-emerald-900 mb-2 group-hover:text-emerald-700 transition-colors">
+                              {section.name}
+                            </h3>
+                            <p className="text-emerald-700 text-sm mb-4 font-medium">{section.description}</p>
+                            <div className="flex items-center text-emerald-600 font-semibold bg-emerald-50 rounded-lg px-3 py-2 group-hover:bg-emerald-100 transition-colors">
+                              <span className="text-sm">Xem chi tiết</span>
+                              <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {selectedSection && !selectedSubsection && (
+              <div className="space-y-6">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-emerald-100 mb-6">
+                  <div className="flex items-center mb-6">
+                    <div className={`w-16 h-16 bg-gradient-to-r ${selectedSection.color} rounded-xl flex items-center justify-center mr-6 shadow-lg`}>
+                      <selectedSection.icon className="w-8 h-8 text-white" />
+                    </div>
+                    <div>
+                      <h1 className="text-3xl font-bold text-emerald-900">{selectedSection.name}</h1>
+                      <p className="text-emerald-700 mt-2 font-medium">{selectedSection.description}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {selectedSection.subsections.map((subsection) => (
+                    <div
+                      key={subsection.id}
+                      onClick={() => handleSubsectionClick(subsection)}
+                      className="group cursor-pointer transform transition-all duration-300 hover:scale-105"
+                    >
+                      <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6 border border-emerald-100 hover:border-emerald-200">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-xl font-semibold text-emerald-900 group-hover:text-emerald-700 transition-colors">
+                            {subsection.name}
+                          </h3>
+                          <ChevronRight className="w-5 h-5 text-emerald-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" />
+                        </div>
+                        <div className="text-sm text-emerald-700">
+                          <div className="flex items-center bg-emerald-50 rounded-lg px-3 py-2">
+                            <Info className="w-4 h-4 mr-2 text-emerald-600" />
+                            <span className="font-medium">{subsection.items.length} sản phẩm</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {selectedSubsection && (
+              <div className="space-y-6">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-emerald-100 mb-6">
+                  <h1 className="text-3xl font-bold text-emerald-900 mb-2">{selectedSubsection.name}</h1>
+                  <p className="text-emerald-700 font-medium">Chi tiết định mức chi phí tái chế</p>
+                </div>
+
+                <div className="space-y-4">
+                  {selectedSubsection.items.map((item, index) => (
+                    <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-emerald-100 overflow-hidden hover:shadow-2xl transition-all duration-300">
+                      <div className="p-6">
+                        <h3 className="text-lg font-semibold text-emerald-900 mb-6">
+                          {item.name.replace('-', '. ')}
+                        </h3>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                          <div className="bg-gradient-to-br from-amber-50 to-yellow-100 rounded-lg p-4 border border-amber-200">
+                            <div className="flex items-center mb-2">
+                              <span className="w-5 h-5 bg-amber-600 rounded-full mr-2 flex items-center justify-center text-xs text-white font-bold">%</span>
+                              <span className="text-sm font-medium text-amber-700">Hệ số điều chỉnh</span>
+                            </div>
+                            <p className="text-2xl font-bold text-amber-800">
+                              {(item.pricing.adjustmentFactor * 100).toFixed(0)}%
+                            </p>
+                          </div>
+
+                          <div className="bg-gradient-to-br from-teal-50 to-emerald-100 rounded-lg p-4 border-2 border-teal-300 relative overflow-hidden">
+                            <div className="absolute top-1 right-1 text-lg opacity-30">🌟</div>
+                            <div className="flex items-center mb-2">
+                              <DollarSign className="w-5 h-5 text-teal-600 mr-2" />
+                              <span className="text-sm font-medium text-teal-700">Tổng chi phí</span>
+                            </div>
+                            <p className="text-2xl font-bold text-teal-800">
+                              {formatCurrency(item.pricing.totalCost)}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-end">
+                          <button
+                            onClick={() => openSubItemForm(item)}
+                            className="flex items-center bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
+                          >
+                            <Plus className="w-5 h-5 mr-2" />
+                            Thêm bao bì
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {showMainProductForm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full border border-emerald-200">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-bold text-emerald-900">Khai báo sản phẩm</h3>
+              <button
+                onClick={() => setShowMainProductForm(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-emerald-700 font-medium mb-2">
+                  <span className="text-red-500">*</span> Tên sản phẩm:
+                </label>
+                <input
+                  type="text"
+                  value={currentMainProduct.productName}
+                  onChange={(e) => setCurrentMainProduct({...currentMainProduct, productName: e.target.value})}
+                  className="w-full p-3 border-2 border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none transition-colors"
+                  placeholder="Nhập tên sản phẩm..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-emerald-700 font-medium mb-2">
+                  Đơn vị tính:
+                </label>
+                <select
+                  value={currentMainProduct.unit}
+                  onChange={(e) => setCurrentMainProduct({...currentMainProduct, unit: e.target.value})}
+                  className="w-full p-3 border-2 border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none transition-colors"
+                >
+                  <option value="Thùng">Thùng</option>
+                  <option value="Chiếc">Chiếc</option>
+                  <option value="Chai">Chai</option>
+                  <option value="Cái">Cái</option>
+                  <option value="Bộ">Bộ</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-emerald-700 font-medium mb-2">
+                  Doanh thu trong nước (VND):
+                </label>
+                <input
+                  type="number"
+                  value={currentMainProduct.domesticRevenue}
+                  onChange={(e) => setCurrentMainProduct({...currentMainProduct, domesticRevenue: e.target.value})}
+                  className="w-full p-3 border-2 border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none transition-colors"
+                  placeholder="Nhập doanh thu..."
+                  min="0"
+                />
+              </div>
+
+              <div>
+                <label className="block text-emerald-700 font-medium mb-2">
+                  <span className="text-red-500">*</span> Số lượng:
+                </label>
+                <input
+                  type="number"
+                  value={currentMainProduct.quantity}
+                  onChange={(e) => setCurrentMainProduct({...currentMainProduct, quantity: e.target.value})}
+                  className="w-full p-3 border-2 border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none transition-colors"
+                  placeholder="Nhập số lượng..."
+                  min="0"
+                />
+              </div>
+            </div>
+            
+            <div className="flex space-x-3 mt-8">
+              <button
+                onClick={() => setShowMainProductForm(false)}
+                className="flex-1 px-4 py-3 border-2 border-emerald-200 text-emerald-700 rounded-lg font-semibold hover:bg-emerald-50 transition-colors"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={saveMainProduct}
+                disabled={!currentMainProduct.productName || !currentMainProduct.quantity || parseFloat(currentMainProduct.quantity) <= 0}
+                className={`flex-1 px-4 py-3 rounded-lg font-semibold transition-colors ${
+                  currentMainProduct.productName && currentMainProduct.quantity && parseFloat(currentMainProduct.quantity) > 0
+                    ? 'bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                Lưu sản phẩm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSubItemForm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-emerald-200">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-bold text-emerald-900">Khai báo bao bì</h3>
+              <button
+                onClick={() => setShowSubItemForm(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="mb-6 p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+              <p className="text-emerald-800 font-medium">{currentSubItem?.name.replace('-', '. ')}</p>
+              <p className="text-sm text-emerald-600 mt-1">
+                Chi phí tái chế: {currentSubItem && formatCurrency(currentSubItem.pricing.totalCost)}/kg
+              </p>
+            </div>
+            
+            <div className="space-y-6">
+              {tempSubItems.map((subItem, index) => (
+                <div key={subItem.id} className="border border-emerald-200 rounded-lg p-6 bg-emerald-50/50">
+                  <div className="flex justify-between items-center mb-4">
+                    <h4 className="text-lg font-semibold text-emerald-800">Bao bì {index + 1}</h4>
+                    {tempSubItems.length > 1 && (
                       <button
-                        onClick={() => deleteMainProduct(index)}
+                        onClick={() => removeTempSubItem(subItem.id)}
                         className="text-red-500 hover:text-red-700 transition-colors"
                       >
                         <X className="w-5 h-5" />
                       </button>
-                    </div>
+                    )}
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    )}
-
-    {/* CATALOG PAGE */}
-    {currentPage === 'catalog' && (
-      <div className={`space-y-6 ${animationClass}`}>
-        <div className="flex justify-between items-center mb-6">
-          <button
-            onClick={handleBackFromCatalog}
-            className="flex items-center text-emerald-700 hover:text-emerald-900 transition-colors group bg-white/70 backdrop-blur-sm rounded-lg px-4 py-2 border border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 shadow-sm"
-          >
-            <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
-            <span className="font-medium">Quay lại</span>
-          </button>
-          
-          {(selectedSection || selectedSubsection) && (
-            <button
-              onClick={() => setCurrentPage('home')}
-              className="flex items-center text-white bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 transition-all px-4 py-2 rounded-lg shadow-lg font-semibold"
-            >
-              <FileText className="w-5 h-5 mr-2" />
-              <span>Về trang chủ</span>
-            </button>
-          )}
-        </div>
-        
-        {renderBreadcrumb()}
-
-        {!selectedSection && (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-emerald-900 mb-4">Danh mục bao bì</h1>
-              {currentMainProductIndex !== null && (
-                <p className="text-emerald-700 font-medium">
-                  Đang khai báo cho: <span className="font-bold">{mainProducts[currentMainProductIndex].productName}</span>
-                </p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {recyclingData.sections.map((section) => {
-                const IconComponent = section.icon;
-                return (
-                  <div
-                    key={section.id}
-                    onClick={() => handleSectionClick(section)}
-                    className="group cursor-pointer transform transition-all duration-300 hover:scale-105"
-                  >
-                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border border-emerald-100 hover:border-emerald-200">
-                      <div className={`h-32 bg-gradient-to-r ${section.color} flex items-center justify-center`}>
-                        <IconComponent className="w-16 h-16 text-white z-10 group-hover:scale-110 transition-transform duration-300 drop-shadow-lg" />
-                      </div>
-                      <div className="p-6">
-                        <h3 className="text-xl font-bold text-emerald-900 mb-2 group-hover:text-emerald-700 transition-colors">
-                          {section.name}
-                        </h3>
-                        <p className="text-emerald-700 text-sm mb-4 font-medium">{section.description}</p>
-                        <div className="flex items-center text-emerald-600 font-semibold bg-emerald-50 rounded-lg px-3 py-2 group-hover:bg-emerald-100 transition-colors">
-                          <span className="text-sm">Xem chi tiết</span>
-                          <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                        </div>
-                      </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-emerald-700 font-medium mb-2">
+                        Tên bao bì:
+                      </label>
+                      <input
+                        type="text"
+                        value={subItem.productName}
+                        onChange={(e) => updateTempSubItem(subItem.id, 'productName', e.target.value)}
+                        className="w-full p-3 border-2 border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none transition-colors"
+                        placeholder="Nhập tên bao bì..."
+                      />
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
 
-        {selectedSection && !selectedSubsection && (
-          <div className="space-y-6">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-emerald-100 mb-6">
-              <div className="flex items-center mb-6">
-                <div className={`w-16 h-16 bg-gradient-to-r ${selectedSection.color} rounded-xl flex items-center justify-center mr-6 shadow-lg`}>
-                  <selectedSection.icon className="w-8 h-8 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-3xl font-bold text-emerald-900">{selectedSection.name}</h1>
-                  <p className="text-emerald-700 mt-2 font-medium">{selectedSection.description}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {selectedSection.subsections.map((subsection) => (
-                <div
-                  key={subsection.id}
-                  onClick={() => handleSubsectionClick(subsection)}
-                  className="group cursor-pointer transform transition-all duration-300 hover:scale-105"
-                >
-                  <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6 border border-emerald-100 hover:border-emerald-200">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-xl font-semibold text-emerald-900 group-hover:text-emerald-700 transition-colors">
-                        {subsection.name}
-                      </h3>
-                      <ChevronRight className="w-5 h-5 text-emerald-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" />
-                    </div>
-                    <div className="text-sm text-emerald-700">
-                      <div className="flex items-center bg-emerald-50 rounded-lg px-3 py-2">
-                        <Info className="w-4 h-4 mr-2 text-emerald-600" />
-                        <span className="font-medium">{subsection.items.length} sản phẩm</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {selectedSubsection && (
-          <div className="space-y-6">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-emerald-100 mb-6">
-              <h1 className="text-3xl font-bold text-emerald-900 mb-2">{selectedSubsection.name}</h1>
-              <p className="text-emerald-700 font-medium">Chi tiết định mức chi phí tái chế</p>
-            </div>
-
-            <div className="space-y-4">
-              {selectedSubsection.items.map((item, index) => (
-                <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-emerald-100 overflow-hidden hover:shadow-2xl transition-all duration-300">
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold text-emerald-900 mb-6">
-                      {item.name}
-                    </h3>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                      <div className="bg-gradient-to-br from-amber-50 to-yellow-100 rounded-lg p-4 border border-amber-200">
-                        <div className="flex items-center mb-2">
-                          <span className="w-5 h-5 bg-amber-600 rounded-full mr-2 flex items-center justify-center text-xs text-white font-bold">%</span>
-                          <span className="text-sm font-medium text-amber-700">Hệ số điều chỉnh</span>
-                        </div>
-                        <p className="text-2xl font-bold text-amber-800">
-                          {(item.pricing.adjustmentFactor * 100).toFixed(0)}%
-                        </p>
-                      </div>
-
-                      <div className="bg-gradient-to-br from-teal-50 to-emerald-100 rounded-lg p-4 border-2 border-teal-300 relative overflow-hidden">
-                        <div className="absolute top-1 right-1 text-lg opacity-30">🌟</div>
-                        <div className="flex items-center mb-2">
-                          <DollarSign className="w-5 h-5 text-teal-600 mr-2" />
-                          <span className="text-sm font-medium text-teal-700">Tổng chi phí</span>
-                        </div>
-                        <p className="text-2xl font-bold text-teal-800">
-                          {formatCurrency(item.pricing.totalCost)}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-end">
-                      <button
-                        onClick={() => openSubItemForm(item)}
-                        className="flex items-center bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
+                    <div>
+                      <label className="block text-emerald-700 font-medium mb-2">
+                        Bao bì:
+                      </label>
+                      <select
+                        value={subItem.packagingType}
+                        onChange={(e) => updateTempSubItem(subItem.id, 'packagingType', e.target.value)}
+                        className="w-full p-3 border-2 border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none transition-colors"
                       >
-                        <Plus className="w-5 h-5 mr-2" />
-                        Thêm bao bì
-                      </button>
+                        <option value="direct">Bao bì trực tiếp</option>
+                        <option value="outer">Bao bì ngoài</option>
+                      </select>
                     </div>
+
+                    <div>
+                      <label className="block text-emerald-700 font-medium mb-2">
+                        Quy Cách:
+                      </label>
+                      <input
+                        type="number"
+                        value={subItem.specification}
+                        onChange={(e) => updateTempSubItem(subItem.id, 'specification', e.target.value)}
+                        className="w-full p-3 border-2 border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none transition-colors"
+                        placeholder="Nhập quy cách..."
+                        min="0"
+                        step="1"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-emerald-700 font-medium mb-2">
+                        <span className="text-red-500">*</span> Khối lượng (kg):
+                      </label>
+                      <input
+                        type="number"
+                        value={subItem.weight}
+                        onChange={(e) => updateTempSubItem(subItem.id, 'weight', e.target.value)}
+                        className="w-full p-3 border-2 border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none transition-colors"
+                        placeholder="Nhập khối lượng..."
+                        min="0"
+                        step="0.1"
+                      />
+                    </div>
+                    
+                    {currentMainProductIndex !== null && (
+                      <div className="md:col-span-2">
+                        <label className="block text-emerald-700 font-medium mb-2">
+                          Thành tiền (VND):
+                        </label>
+                        <div className="p-3 bg-gray-100 border-2 border-gray-200 rounded-lg text-emerald-800 font-bold">
+                          {subItem.weight && subItem.specification && currentSubItem
+                            ? formatCurrency(
+                                parseFloat(mainProducts[currentMainProductIndex].quantity) * 
+                                parseFloat(subItem.specification) * 
+                                parseFloat(subItem.weight) * 
+                                currentSubItem.pricing.totalCost *
+                                currentSubItem.pricing.adjustmentFactor
+                              )
+                            : '0 ₫'
+                          }
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-        )}
-      </div>
-    )}
-  </div>
-
-  {/* Main Product Form Modal */}
-  {showMainProductForm && (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full border border-emerald-200">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-2xl font-bold text-emerald-900">Khai báo sản phẩm</h3>
-          <button
-            onClick={() => setShowMainProductForm(false)}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-        
-        <div className="space-y-4">
-          <div>
-            <label className="block text-emerald-700 font-medium mb-2">
-              <span className="text-red-500">*</span> Tên sản phẩm:
-            </label>
-            <input
-              type="text"
-              value={currentMainProduct.productName}
-              onChange={(e) => setCurrentMainProduct({...currentMainProduct, productName: e.target.value})}
-              className="w-full p-3 border-2 border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none transition-colors"
-              placeholder="Nhập tên sản phẩm..."
-            />
-          </div>
-
-          <div>
-            <label className="block text-emerald-700 font-medium mb-2">
-              Đơn vị tính:
-            </label>
-            <select
-              value={currentMainProduct.unit}
-              onChange={(e) => setCurrentMainProduct({...currentMainProduct, unit: e.target.value})}
-              className="w-full p-3 border-2 border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none transition-colors"
-            >
-              <option value="Thùng">Thùng</option>
-              <option value="Chiếc">Chiếc</option>
-              <option value="Chai">Chai</option>
-              <option value="Cái">Cái</option>
-              <option value="Bộ">Bộ</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-emerald-700 font-medium mb-2">
-              Doanh thu trong nước (VND):
-            </label>
-            <input
-              type="number"
-              value={currentMainProduct.domesticRevenue}
-              onChange={(e) => setCurrentMainProduct({...currentMainProduct, domesticRevenue: e.target.value})}
-              className="w-full p-3 border-2 border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none transition-colors"
-              placeholder="Nhập doanh thu..."
-              min="0"
-            />
-          </div>
-
-          <div>
-            <label className="block text-emerald-700 font-medium mb-2">
-              <span className="text-red-500">*</span> Số lượng:
-            </label>
-            <input
-              type="number"
-              value={currentMainProduct.quantity}
-              onChange={(e) => setCurrentMainProduct({...currentMainProduct, quantity: e.target.value})}
-              className="w-full p-3 border-2 border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none transition-colors"
-              placeholder="Nhập số lượng..."
-              min="0"
-            />
-          </div>
-        </div>
-        
-        <div className="flex space-x-3 mt-8">
-          <button
-            onClick={() => setShowMainProductForm(false)}
-            className="flex-1 px-4 py-3 border-2 border-emerald-200 text-emerald-700 rounded-lg font-semibold hover:bg-emerald-50 transition-colors"
-          >
-            Hủy
-          </button>
-          <button
-            onClick={saveMainProduct}
-            disabled={!currentMainProduct.productName || !currentMainProduct.quantity || parseFloat(currentMainProduct.quantity) <= 0}
-            className={`flex-1 px-4 py-3 rounded-lg font-semibold transition-colors ${
-              currentMainProduct.productName && currentMainProduct.quantity && parseFloat(currentMainProduct.quantity) > 0
-                ? 'bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            Lưu sản phẩm
-          </button>
-        </div>
-      </div>
-    </div>
-  )}
-
-  {/* Sub Item Form Modal */}
-  {showSubItemForm && (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-emerald-200">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-2xl font-bold text-emerald-900">Khai báo bao bì</h3>
-          <button
-            onClick={() => setShowSubItemForm(false)}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-        
-        <div className="mb-6 p-4 bg-emerald-50 rounded-lg border border-emerald-200">
-          <p className="text-emerald-800 font-medium">{currentSubItem?.name}</p>
-          <p className="text-sm text-emerald-600 mt-1">
-            Chi phí tái chế: {currentSubItem && formatCurrency(currentSubItem.pricing.totalCost)}/kg
-          </p>
-        </div>
-        
-        <div className="space-y-6">
-          {tempSubItems.map((subItem, index) => (
-            <div key={subItem.id} className="border border-emerald-200 rounded-lg p-6 bg-emerald-50/50">
-              <div className="flex justify-between items-center mb-4">
-                <h4 className="text-lg font-semibold text-emerald-800">Bao bì {index + 1}</h4>
-                {tempSubItems.length > 1 && (
-                  <button
-                    onClick={() => removeTempSubItem(subItem.id)}
-                    className="text-red-500 hover:text-red-700 transition-colors"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                )}
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-emerald-700 font-medium mb-2">
-                    Tên bao bì:
-                  </label>
-                  <input
-                    type="text"
-                    value={subItem.productName}
-                    onChange={(e) => updateTempSubItem(subItem.id, 'productName', e.target.value)}
-                    className="w-full p-3 border-2 border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none transition-colors"
-                    placeholder="Nhập tên bao bì..."
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-emerald-700 font-medium mb-2">
-                    Bao bì:
-                  </label>
-                  <select
-                    value={subItem.packagingType}
-                    onChange={(e) => updateTempSubItem(subItem.id, 'packagingType', e.target.value)}
-                    className="w-full p-3 border-2 border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none transition-colors"
-                  >
-                    <option value="direct">Bao bì trực tiếp</option>
-                    <option value="outer">Bao bì ngoài</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-emerald-700 font-medium mb-2">
-                    Quy Cách:
-                  </label>
-                  <input
-                    type="number"
-                    value={subItem.specification}
-                    onChange={(e) => updateTempSubItem(subItem.id, 'specification', e.target.value)}
-                    className="w-full p-3 border-2 border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none transition-colors"
-                    placeholder="Nhập quy cách..."
-                    min="0"
-                    step="1"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-emerald-700 font-medium mb-2">
-                    <span className="text-red-500">*</span> Khối lượng (kg):
-                  </label>
-                  <input
-                    type="number"
-                    value={subItem.weight}
-                    onChange={(e) => updateTempSubItem(subItem.id, 'weight', e.target.value)}
-                    className="w-full p-3 border-2 border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none transition-colors"
-                    placeholder="Nhập khối lượng..."
-                    min="0"
-                    step="0.1"
-                  />
-                </div>
-                
-                {currentMainProductIndex !== null && (
-                  <div className="md:col-span-2">
-                    <label className="block text-emerald-700 font-medium mb-2">
-                      Thành tiền (VND):
-                    </label>
-                    <div className="p-3 bg-gray-100 border-2 border-gray-200 rounded-lg text-emerald-800 font-bold">
-                      {subItem.weight && subItem.specification && currentSubItem
-                        ? formatCurrency(
-                            parseFloat(mainProducts[currentMainProductIndex].quantity) * 
-                            parseFloat(subItem.specification) * 
-                            parseFloat(subItem.weight) * 
-                            currentSubItem.pricing.totalCost
-                          )
-                        : '0 ₫'
-                      }
-                    </div>
-                  </div>
-                )}
-              </div>
+            
+            <div className="flex justify-center mt-6">
+              <button
+                onClick={addTempSubItem}
+                className="flex items-center bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Thêm bao bì
+              </button>
             </div>
-          ))}
-        </div>
-        
-        <div className="flex justify-center mt-6">
-          <button
-            onClick={addTempSubItem}
-            className="flex items-center bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            Thêm bao bì
-          </button>
-        </div>
-        
-        <div className="flex space-x-3 mt-8">
-          <button
-            onClick={() => setShowSubItemForm(false)}
-            className="flex-1 px-4 py-3 border-2 border-emerald-200 text-emerald-700 rounded-lg font-semibold hover:bg-emerald-50 transition-colors"
-          >
-            Hủy
-          </button>
-          <button
-            onClick={saveSubItems}
-            disabled={!tempSubItems.some(item => item.productName && item.weight && parseFloat(item.weight) > 0)}
-            className={`flex-1 px-4 py-3 rounded-lg font-semibold transition-colors ${
-              tempSubItems.some(item => item.productName && item.weight && parseFloat(item.weight) > 0)
-                ? 'bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            Lưu bao bì
-          </button>
-        </div>
-      </div>
-    </div>
-  )}
-
-  {/* Declared Items Modal */}
-  {showDeclaredItems && (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-6xl w-full max-h-[90vh] overflow-y-auto border border-emerald-200">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-2xl font-bold text-emerald-900">Danh sách đã khai báo</h3>
-<button
-onClick={() => setShowDeclaredItems(false)}
-className="text-gray-400 hover:text-gray-600 transition-colors"
->
-<X className="w-6 h-6" />
-</button>
-</div>
-{getTotalSubItemsCount() === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">🌱</div>
-            <p className="text-emerald-600 text-lg">Chưa có bao bì nào được khai báo</p>
+            
+            <div className="flex space-x-3 mt-8">
+              <button
+                onClick={() => setShowSubItemForm(false)}
+                className="flex-1 px-4 py-3 border-2 border-emerald-200 text-emerald-700 rounded-lg font-semibold hover:bg-emerald-50 transition-colors"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={saveSubItems}
+                disabled={!tempSubItems.some(item => item.productName && item.weight && parseFloat(item.weight) > 0)}
+                className={`flex-1 px-4 py-3 rounded-lg font-semibold transition-colors ${
+                  tempSubItems.some(item => item.productName && item.weight && parseFloat(item.weight) > 0)
+                    ? 'bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                Lưu bao bì
+              </button>
+            </div>
           </div>
-        ) : (
-          <div className="space-y-6">
-            {mainProducts.map((mainProduct, mainIndex) => (
-              subItems[mainIndex] && subItems[mainIndex].length > 0 && (
-                <div key={mainIndex} className="border border-emerald-200 rounded-lg p-4 bg-emerald-50/30">
-                  <h4 className="text-xl font-bold text-emerald-900 mb-4">{mainProduct.productName}</h4>
-                  <div className="bg-white rounded-lg overflow-hidden">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="bg-gradient-to-r from-emerald-50 to-green-50">
-                          <th className="text-left p-3 text-emerald-800 font-semibold border border-emerald-200">Tên bao bì</th>
-                          <th className="text-center p-3 text-emerald-800 font-semibold border border-emerald-200">Loại</th>
-                          <th className="text-center p-3 text-emerald-800 font-semibold border border-emerald-200">Quy cách</th>
-                          <th className="text-center p-3 text-emerald-800 font-semibold border border-emerald-200">Khối lượng (kg)</th>
-                          <th className="text-right p-3 text-emerald-800 font-semibold border border-emerald-200">Thành tiền</th>
-                          <th className="text-center p-3 text-emerald-800 font-semibold border border-emerald-200">Thao tác</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {subItems[mainIndex].map((subItem, subIndex) => (
-                          <tr key={subIndex} className="hover:bg-emerald-50/50 transition-colors">
-                            <td className="p-3 border border-emerald-100">
+        </div>
+      )}
+
+      {showDeclaredItems && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-6xl w-full max-h-[90vh] overflow-y-auto border border-emerald-200">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-bold text-emerald-900">Danh sách đã khai báo</h3>
+              <button
+                onClick={() => setShowDeclaredItems(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            {getTotalSubItemsCount() === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">🌱</div>
+                <p className="text-emerald-600 text-lg">Chưa có bao bì nào được khai báo</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {mainProducts.map((mainProduct, mainIndex) => (
+                  subItems[mainIndex] && subItems[mainIndex].length > 0 && (
+                    <div key={mainIndex} className="border border-emerald-200 rounded-lg p-4 bg-emerald-50/30">
+                      <h4 className="text-xl font-bold text-emerald-900 mb-4">{mainProduct.productName}</h4>
+                      <div className="bg-white rounded-lg overflow-hidden">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="bg-gradient-to-r from-emerald-50 to-green-50">
+                              <th className="text-left p-3 text-emerald-800 font-semibold border border-emerald-200">Tên bao bì</th>
+                              <th className="text-center p-3 text-emerald-800 font-semibold border border-emerald-200">Loại</th>
+                              <th className="text-center p-3 text-emerald-800 font-semibold border border-emerald-200">Quy cách</th>
+                              <th className="text-center p-3 text-emerald-800 font-semibold border border-emerald-200">Khối lượng (kg)</th>
+                              <th className="text-right p-3 text-emerald-800 font-semibold border border-emerald-200">Thành tiền</th>
+                              <th className="text-center p-3 text-emerald-800 font-semibold border border-emerald-200">Thao tác</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {subItems[mainIndex].map((subItem, subIndex) => (
+                              <tr key={subIndex} className="hover:bg-emerald-50/50 transition-colors">
+                                <td className="p-3 border border-emerald-100">
+                                  <div>
+                                    <p className="font-medium text-emerald-900">{subItem.productName}</p>
+                                    <p className="text-sm text-emerald-600">{subItem.catalogItem.name.replace('-', '. ')}</p>
+                                  </div>
+                                </td>
+                                <td className="text-center p-3 border border-emerald-100 text-emerald-700 text-sm">
+                                  {subItem.packagingType === 'direct' ? 'Bao bì trực tiếp' : 'Bao bì ngoài'}
+                                </td>
+                                <td className="text-center p-3 border border-emerald-100 font-semibold text-emerald-800">
+                                  {subItem.specification || '-'}
+                                </td>
+                                <td className="text-center p-3 border border-emerald-100 font-semibold text-emerald-800">
+                                  {subItem.weight} kg
+                                </td>
+                                <td className="text-right p-3 border border-emerald-100 font-bold text-emerald-900">
+                                  {formatCurrency(calculateSubItemCost(mainProduct, subItem))}
+                                </td>
+                                <td className="text-center p-3 border border-emerald-100">
+                                  <button
+                                    onClick={() => deleteSubItem(mainIndex, subIndex)}
+                                    className="text-red-500 hover:text-red-700 transition-colors"
+                                  >
+                                    <X className="w-5 h-5" />
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {showSummary && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-6xl w-full max-h-[90vh] overflow-y-auto border border-emerald-200">
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-3xl font-bold text-emerald-900">Bảng tổng hợp chi phí tái chế</h3>
+              <button
+                onClick={() => setShowSummary(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            {getTotalSubItemsCount() === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">📋</div>
+                <p className="text-emerald-600 text-lg">Chưa có bao bì nào được khai báo</p>
+              </div>
+            ) : (
+              <>
+                <div className="overflow-x-auto mb-8">
+                  <table className="w-full border-collapse bg-white rounded-xl overflow-hidden shadow-lg">
+                    <thead>
+                      <tr className="bg-gradient-to-r from-emerald-600 to-green-700 text-white">
+                        <th className="text-left p-4 font-bold">Tên sản phẩm</th>
+                        <th className="text-center p-4 font-bold">Đơn vị</th>
+                        <th className="text-right p-4 font-bold">Doanh thu</th>
+                        <th className="text-center p-4 font-bold">Số lượng</th>
+                        <th className="text-left p-4 font-bold">Tên bao bì</th>
+                        <th className="text-center p-4 font-bold">Loại bao bì</th>
+                        <th className="text-center p-4 font-bold">Quy cách</th>
+                        <th className="text-center p-4 font-bold">Khối lượng (kg)</th>
+                        <th className="text-right p-4 font-bold">Đơn giá</th>
+                        <th className="text-right p-4 font-bold">Thành tiền</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {mainProducts.map((mainProduct, mainIndex) => (
+                        subItems[mainIndex] && subItems[mainIndex].map((subItem, subIndex) => (
+                          <tr key={`${mainIndex}-${subIndex}`} className={`${subIndex % 2 === 0 ? 'bg-emerald-50/50' : 'bg-white'} hover:bg-emerald-100/50 transition-colors`}>
+                            <td className="p-4 border-b border-emerald-100 font-semibold text-emerald-900">{mainProduct.productName}</td>
+                            <td className="text-center p-4 border-b border-emerald-100">
+                              <span className="inline-block bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full text-sm font-medium">
+                                {mainProduct.unit}
+                              </span>
+                            </td>
+                            <td className="text-right p-4 border-b border-emerald-100 text-emerald-700 font-medium">
+                              {mainProduct.domesticRevenue ? formatCurrency(mainProduct.domesticRevenue) : '-'}
+                            </td>
+                            <td className="text-center p-4 border-b border-emerald-100">
+                              <span className="inline-block bg-purple-100 text-purple-800 px-3 py-1 rounded-full font-semibold">
+                                {mainProduct.quantity}
+                              </span>
+                            </td>
+                            <td className="p-4 border-b border-emerald-100">
                               <div>
-                                <p className="font-medium text-emerald-900">{subItem.productName}</p>
-                                <p className="text-sm text-emerald-600">{subItem.catalogItem.name}</p>
+                                <p className="font-semibold text-emerald-900">{subItem.productName}</p>
+                                <p className="text-sm text-emerald-600 mt-1">{subItem.catalogItem.name.replace('-', '. ')}</p>
                               </div>
                             </td>
-                            <td className="text-center p-3 border border-emerald-100 text-emerald-700 text-sm">
-                              {subItem.packagingType === 'direct' ? 'Bao bì trực tiếp' : 'Bao bì ngoài'}
+                            <td className="text-center p-4 border-b border-emerald-100">
+                              <span className="inline-block bg-amber-100 text-amber-800 px-2 py-1 rounded-full text-sm font-medium">
+                                {subItem.packagingType === 'direct' ? 'Bao bì trực tiếp' : 'Bao bì ngoài'}
+                              </span>
                             </td>
-                            <td className="text-center p-3 border border-emerald-100 font-semibold text-emerald-800">
-                              {subItem.specification || '-'}
+                            <td className="text-center p-4 border-b border-emerald-100">
+                              <span className="inline-block bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full font-semibold">
+                                {subItem.specification || '-'}
+                              </span>
                             </td>
-                            <td className="text-center p-3 border border-emerald-100 font-semibold text-emerald-800">
-                              {subItem.weight} kg
+                            <td className="text-center p-4 border-b border-emerald-100">
+                              <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold">
+                                {subItem.weight} kg
+                              </span>
                             </td>
-                            <td className="text-right p-3 border border-emerald-100 font-bold text-emerald-900">
+                            <td className="text-right p-4 border-b border-emerald-100 text-emerald-700 font-medium">
+                              {formatCurrency(subItem.catalogItem.pricing.totalCost)}
+                            </td>
+                            <td className="text-right p-4 border-b border-emerald-100 font-bold text-emerald-900">
                               {formatCurrency(calculateSubItemCost(mainProduct, subItem))}
                             </td>
-                            <td className="text-center p-3 border border-emerald-100">
-                              <button
-                                onClick={() => deleteSubItem(mainIndex, subIndex)}
-                                className="text-red-500 hover:text-red-700 transition-colors"
-                              >
-                                <X className="w-5 h-5" />
-                              </button>
-                            </td>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        ))
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                
+                <div className="bg-gradient-to-r from-emerald-600 to-green-700 rounded-xl p-6 text-white">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h4 className="text-xl font-bold mb-2">TỔNG CHI PHÍ TÁI CHẾ</h4>
+                      <p className="text-emerald-100">Tổng cộng {getTotalSubItemsCount()} bao bì</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-3xl font-bold">
+                        {formatCurrency(getTotalCost())}
+                      </p>
+                      <p className="text-emerald-200 text-sm mt-1">VND</p>
+                    </div>
                   </div>
                 </div>
-              )
-            ))}
+                
+                <div className="flex justify-center gap-4 mt-8">
+                  <button
+                    onClick={() => {
+                      exportToExcel();
+                      alert('Đã gửi thành công! Cảm ơn bạn đã quan tâm đến môi trường.');
+                      setShowSummary(false);
+                    }}
+                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center"
+                  >
+                    <Download className="w-6 h-6 mr-3" />
+                    Gửi báo cáo tái chế
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      exportEPRFormat();
+                      alert('Đã xuất báo cáo kê khai EPR thành công!');
+                      setShowSummary(false);
+                    }}
+                    className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center"
+                  >
+                    <Download className="w-6 h-6 mr-3" />
+                    Gửi báo cáo kê khai EPR
+                  </button>
+                </div>
+              </>
+            )}
           </div>
-        )}
-      </div>
-    </div>
-  )}
-
-  {/* Summary Modal */}
-  {showSummary && (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-6xl w-full max-h-[90vh] overflow-y-auto border border-emerald-200">
-        <div className="flex justify-between items-center mb-8">
-          <h3 className="text-3xl font-bold text-emerald-900">Bảng tổng hợp chi phí tái chế</h3>
-          <button
-            onClick={() => setShowSummary(false)}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <X className="w-6 h-6" />
-          </button>
         </div>
+      )}
+      
+      <style jsx>{`
+        .slide-in {
+          animation: slideIn 0.3s ease-out forwards;
+        }
         
-        {getTotalSubItemsCount() === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">📋</div>
-            <p className="text-emerald-600 text-lg">Chưa có bao bì nào được khai báo</p>
-          </div>
-        ) : (
-          <>
-            <div className="overflow-x-auto mb-8">
-              <table className="w-full border-collapse bg-white rounded-xl overflow-hidden shadow-lg">
-                <thead>
-                  <tr className="bg-gradient-to-r from-emerald-600 to-green-700 text-white">
-                    <th className="text-left p-4 font-bold">Tên sản phẩm</th>
-                    <th className="text-center p-4 font-bold">Đơn vị</th>
-                    <th className="text-right p-4 font-bold">Doanh thu</th>
-                    <th className="text-center p-4 font-bold">Số lượng</th>
-                    <th className="text-left p-4 font-bold">Tên bao bì</th>
-                    <th className="text-center p-4 font-bold">Loại bao bì</th>
-                    <th className="text-center p-4 font-bold">Quy cách</th>
-                    <th className="text-center p-4 font-bold">Khối lượng (kg)</th>
-                    <th className="text-right p-4 font-bold">Đơn giá</th>
-                    <th className="text-right p-4 font-bold">Thành tiền</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {mainProducts.map((mainProduct, mainIndex) => (
-                    subItems[mainIndex] && subItems[mainIndex].map((subItem, subIndex) => (
-                      <tr key={`${mainIndex}-${subIndex}`} className={`${subIndex % 2 === 0 ? 'bg-emerald-50/50' : 'bg-white'} hover:bg-emerald-100/50 transition-colors`}>
-                        <td className="p-4 border-b border-emerald-100 font-semibold text-emerald-900">{mainProduct.productName}</td>
-                        <td className="text-center p-4 border-b border-emerald-100">
-                          <span className="inline-block bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full text-sm font-medium">
-                            {mainProduct.unit}
-                          </span>
-                        </td>
-                        <td className="text-right p-4 border-b border-emerald-100 text-emerald-700 font-medium">
-                          {mainProduct.domesticRevenue ? formatCurrency(mainProduct.domesticRevenue) : '-'}
-                        </td>
-                        <td className="text-center p-4 border-b border-emerald-100">
-                          <span className="inline-block bg-purple-100 text-purple-800 px-3 py-1 rounded-full font-semibold">
-                            {mainProduct.quantity}
-                          </span>
-                        </td>
-                        <td className="p-4 border-b border-emerald-100">
-                          <div>
-                            <p className="font-semibold text-emerald-900">{subItem.productName}</p>
-                            <p className="text-sm text-emerald-600 mt-1">{subItem.catalogItem.name}</p>
-                          </div>
-                        </td>
-                        <td className="text-center p-4 border-b border-emerald-100">
-                          <span className="inline-block bg-amber-100 text-amber-800 px-2 py-1 rounded-full text-sm font-medium">
-                            {subItem.packagingType === 'direct' ? 'Bao bì trực tiếp' : 'Bao bì ngoài'}
-                          </span>
-                        </td>
-                        <td className="text-center p-4 border-b border-emerald-100">
-                          <span className="inline-block bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full font-semibold">
-                            {subItem.specification || '-'}
-                          </span>
-                        </td>
-                        <td className="text-center p-4 border-b border-emerald-100">
-                          <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold">
-                            {subItem.weight} kg
-                          </span>
-                        </td>
-                        <td className="text-right p-4 border-b border-emerald-100 text-emerald-700 font-medium">
-                          {formatCurrency(subItem.catalogItem.pricing.totalCost)}
-                        </td>
-                        <td className="text-right p-4 border-b border-emerald-100 font-bold text-emerald-900">
-                          {formatCurrency(calculateSubItemCost(mainProduct, subItem))}
-                        </td>
-                      </tr>
-                    ))
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            
-            <div className="bg-gradient-to-r from-emerald-600 to-green-700 rounded-xl p-6 text-white">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h4 className="text-xl font-bold mb-2">TỔNG CHI PHÍ TÁI CHẾ</h4>
-                  <p className="text-emerald-100">Tổng cộng {getTotalSubItemsCount()} bao bì</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-3xl font-bold">
-                    {formatCurrency(getTotalCost())}
-                  </p>
-                  <p className="text-emerald-200 text-sm mt-1">VND</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex justify-center gap-4 mt-8">
-              <button
-                onClick={() => {
-                  exportToExcel();
-                  alert('Đã gửi thành công! Cảm ơn bạn đã quan tâm đến môi trường.');
-                  setShowSummary(false);
-                }}
-                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center"
-              >
-                <Download className="w-6 h-6 mr-3" />
-                Gửi báo cáo tái chế
-              </button>
-              
-              <button
-                onClick={() => {
-                  exportEPRFormat();
-                  alert('Đã xuất báo cáo kê khai EPR thành công!');
-                  setShowSummary(false);
-                }}
-                className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center"
-              >
-                <Download className="w-6 h-6 mr-3" />
-                Gửi báo cáo kê khai EPR
-              </button>
-            </div>
-          </>
-        )}
-      </div>
+        .slide-out {
+          animation: slideOut 0.15s ease-in forwards;
+        }
+        
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes slideOut {
+          from {
+            opacity: 1;
+            transform: translateY(0);
+          }
+          to {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+        }
+      `}</style>
     </div>
-  )}
-  
-  <style jsx>{`
-    .slide-in {
-      animation: slideIn 0.3s ease-out forwards;
-    }
-    
-    .slide-out {
-      animation: slideOut 0.15s ease-in forwards;
-    }
-    
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    @keyframes slideOut {
-      from {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      to {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-    }
-  `}</style>
-</div>);
+  );
 };
+
 export default RecyclingCostNavigator;
