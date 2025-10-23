@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ChevronRight, FileText, Info, Plus, DollarSign, CheckCircle, Package, Eye, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, ChevronRight, FileText, Info, Plus, DollarSign, CheckCircle, Package, Eye, ChevronDown, ChevronUp, Edit, X } from 'lucide-react';
 import { recyclingData } from '../data/recyclingData';
 import { formatCurrency, calculateSubItemCost } from '../utils/calculations';
 
@@ -15,7 +15,9 @@ const CatalogPage = ({
   onSectionClick,
   onSubsectionClick,
   onOpenSubItemForm,
-  onGoHome
+  onGoHome,
+  onEditSubItem,
+  onDeleteSubItem
 }) => {
   const [showDetailPanel, setShowDetailPanel] = useState(false);
   // Helper function to count items added for current main product in a specific subsection
@@ -117,13 +119,33 @@ const CatalogPage = ({
                           <h4 className="font-semibold text-emerald-900 text-lg">{item.productName}</h4>
                           <p className="text-sm text-emerald-600 mt-1">{item.catalogItem.name.replace('-', '. ')}</p>
                         </div>
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          item.packagingType === 'direct'
-                            ? 'bg-blue-100 text-blue-700'
-                            : 'bg-purple-100 text-purple-700'
-                        }`}>
-                          {item.packagingType === 'direct' ? 'Bao bì trực tiếp' : 'Bao bì ngoài'}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            item.packagingType === 'direct'
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-purple-100 text-purple-700'
+                          }`}>
+                            {item.packagingType === 'direct' ? 'Bao bì trực tiếp' : 'Bao bì ngoài'}
+                          </span>
+                          <button
+                            onClick={() => onEditSubItem(currentMainProductIndex, index)}
+                            className="text-blue-500 hover:text-blue-700 transition-colors p-1"
+                            title="Chỉnh sửa"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (window.confirm('Bạn có chắc chắn muốn xóa bao bì này?')) {
+                                onDeleteSubItem(currentMainProductIndex, index);
+                              }
+                            }}
+                            className="text-red-500 hover:text-red-700 transition-colors p-1"
+                            title="Xóa"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3 text-sm">
@@ -318,20 +340,49 @@ const CatalogPage = ({
                           Bao bì đã khai báo:
                         </h4>
                         <div className="space-y-2">
-                          {addedItems.map((addedItem, idx) => (
-                            <div key={idx} className="text-sm text-emerald-700 bg-emerald-50/50 rounded px-3 py-2 border border-emerald-100">
-                              <div className="flex justify-between items-center">
-                                <span className="font-medium">{addedItem.productName}</span>
-                                <span className="text-xs text-emerald-600">
-                                  {addedItem.packagingType === 'direct' ? 'Trực tiếp' : 'Bao bì ngoài'}
-                                </span>
+                          {addedItems.map((addedItem, idx) => {
+                            // Find the actual index in subItems array
+                            const actualIndex = subItems[currentMainProductIndex].findIndex(
+                              si => si.productName === addedItem.productName &&
+                                    si.weight === addedItem.weight &&
+                                    si.specification === addedItem.specification &&
+                                    si.catalogItem.name === item.name
+                            );
+                            return (
+                              <div key={idx} className="text-sm text-emerald-700 bg-emerald-50/50 rounded px-3 py-2 border border-emerald-100">
+                                <div className="flex justify-between items-center">
+                                  <span className="font-medium">{addedItem.productName}</span>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs text-emerald-600">
+                                      {addedItem.packagingType === 'direct' ? 'Trực tiếp' : 'Bao bì ngoài'}
+                                    </span>
+                                    <button
+                                      onClick={() => onEditSubItem(currentMainProductIndex, actualIndex)}
+                                      className="text-blue-500 hover:text-blue-700 transition-colors p-1"
+                                      title="Chỉnh sửa"
+                                    >
+                                      <Edit className="w-3 h-3" />
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        if (window.confirm('Bạn có chắc chắn muốn xóa bao bì này?')) {
+                                          onDeleteSubItem(currentMainProductIndex, actualIndex);
+                                        }
+                                      }}
+                                      className="text-red-500 hover:text-red-700 transition-colors p-1"
+                                      title="Xóa"
+                                    >
+                                      <X className="w-3 h-3" />
+                                    </button>
+                                  </div>
+                                </div>
+                                <div className="flex gap-4 mt-1 text-xs text-emerald-600">
+                                  <span>Quy cách: {addedItem.specification || '-'}</span>
+                                  <span>Khối lượng: {addedItem.weight} kg</span>
+                                </div>
                               </div>
-                              <div className="flex gap-4 mt-1 text-xs text-emerald-600">
-                                <span>Quy cách: {addedItem.specification || '-'}</span>
-                                <span>Khối lượng: {addedItem.weight} kg</span>
-                              </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
                     )}

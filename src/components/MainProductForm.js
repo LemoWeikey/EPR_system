@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 
 const MainProductForm = ({
   currentMainProduct,
+  isEditing = false,
   onProductChange,
   onSave,
   onClose
@@ -11,7 +12,9 @@ const MainProductForm = ({
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full border border-emerald-200">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-2xl font-bold text-emerald-900">Khai báo sản phẩm</h3>
+          <h3 className="text-2xl font-bold text-emerald-900">
+            {isEditing ? 'Chỉnh sửa sản phẩm' : 'Khai báo sản phẩm'}
+          </h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -44,6 +47,7 @@ const MainProductForm = ({
               className="w-full p-3 border-2 border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none transition-colors"
             >
               <option value="Thùng">Thùng</option>
+              <option value="Hộp">Hộp</option>
               <option value="Chiếc">Chiếc</option>
               <option value="Chai">Chai</option>
               <option value="Cái">Cái</option>
@@ -95,7 +99,7 @@ const MainProductForm = ({
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
           >
-            Lưu sản phẩm
+            {isEditing ? 'Cập nhật sản phẩm' : 'Lưu sản phẩm'}
           </button>
         </div>
       </div>

@@ -81,7 +81,7 @@ export const recyclingData = {
               }
             },
             {
-              "name": "A.3.3-Bao bì EPS cứng",
+              "name": "A.3.3.1-Bao bì EPS,PVC cứng và bao bì nhựa cứng khác - Bao bì EPS cứng",
               "pricing": {
                 "baseCost": 9700,
                 "adjustmentFactor": 0.1,
@@ -90,16 +90,25 @@ export const recyclingData = {
               }
             },
             {
-              "name": "A.3.5-Bao bì PVC cứng",
+              "name": "A.3.3.2-Bao bì EPS,PVC cứng và bao bì nhựa cứng khác - Bao bì PVC cứng",
               "pricing": {
                 "baseCost": 9700,
-                "adjustmentFactor": 0.8,
-                "managementCost": 155.0,
+                "adjustmentFactor": 0.1,
+                "managementCost": 116.0,
                 "totalCost": 7915.0
               }
             },
             {
-              "name": "A.3.4a-Bao bì đơn vật liệu mềm",
+              "name": "A.3.3.3-Bao bì EPS,PVC cứng và bao bì nhựa cứng khác - Bao bì nhụa cứng khác",
+              "pricing": {
+                "baseCost": 9700,
+                "adjustmentFactor": 0.1,
+                "managementCost": 116.0,
+                "totalCost": 5936.0
+              }
+            },
+            {
+              "name": "A.3.4.1-Bao bì nhựa mềm - Bao bì đơn vật liệu mềm",
               "pricing": {
                 "baseCost": 10400,
                 "adjustmentFactor": 0.1,
@@ -108,7 +117,7 @@ export const recyclingData = {
               }
             },
             {
-              "name": "A.3.4b-Bao bì đa vật liệu mềm",
+              "name": "A.3.4.2-Bao bì nhựa mềm - Bao bì đa vật liệu mềm",
               "pricing": {
                 "baseCost": 10700,
                 "adjustmentFactor": 0.1,

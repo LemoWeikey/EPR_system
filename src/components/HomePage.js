@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, CheckCircle, Send, X, FileText } from 'lucide-react';
+import { Plus, CheckCircle, Send, X, FileText, Edit } from 'lucide-react';
 import { recyclingData } from '../data/recyclingData';
 import { formatCurrency, getTotalSubItemsCount } from '../utils/calculations';
 
@@ -11,7 +11,8 @@ const HomePage = ({
   onShowDeclaredItems,
   onShowSummary,
   onDeleteMainProduct,
-  onOpenCatalog
+  onOpenCatalog,
+  onEditMainProduct
 }) => {
   return (
     <div className={`space-y-6 ${animationClass}`}>
@@ -83,8 +84,16 @@ const HomePage = ({
                       Danh mục bao bì
                     </button>
                     <button
+                      onClick={() => onEditMainProduct(index)}
+                      className="text-blue-500 hover:text-blue-700 transition-colors p-2"
+                      title="Chỉnh sửa"
+                    >
+                      <Edit className="w-5 h-5" />
+                    </button>
+                    <button
                       onClick={() => onDeleteMainProduct(index)}
-                      className="text-red-500 hover:text-red-700 transition-colors"
+                      className="text-red-500 hover:text-red-700 transition-colors p-2"
+                      title="Xóa"
                     >
                       <X className="w-5 h-5" />
                     </button>

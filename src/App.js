@@ -51,6 +51,12 @@ const RecyclingCostNavigator = () => {
     setShowMainProductForm(true);
   };
 
+  const editMainProduct = (index) => {
+    setCurrentMainProduct({ ...mainProducts[index] });
+    setEditingMainProductIndex(index);
+    setShowMainProductForm(true);
+  };
+
   const saveMainProduct = () => {
     if (currentMainProduct.productName && currentMainProduct.quantity && parseFloat(currentMainProduct.quantity) > 0) {
       if (editingMainProductIndex !== null) {
@@ -130,6 +136,7 @@ const RecyclingCostNavigator = () => {
       specification: '',
       weight: ''
     }]);
+    setEditingSubItemIndices(null); // Reset editing mode
     setShowSubItemForm(true);
   };
 
@@ -162,22 +169,36 @@ const RecyclingCostNavigator = () => {
 
     if (validItems.length > 0 && currentMainProductIndex !== null && currentSubItem) {
       const newSubItems = { ...subItems };
-      if (!newSubItems[currentMainProductIndex]) {
-        newSubItems[currentMainProductIndex] = [];
-      }
 
-      validItems.forEach(item => {
-        newSubItems[currentMainProductIndex].push({
-          ...item,
+      // Check if we're editing an existing item
+      if (editingSubItemIndices) {
+        // Update existing item
+        newSubItems[editingSubItemIndices.mainIndex][editingSubItemIndices.subIndex] = {
+          ...validItems[0],
           catalogItem: currentSubItem,
           section: selectedSection,
           subsection: selectedSubsection
+        };
+      } else {
+        // Add new items
+        if (!newSubItems[currentMainProductIndex]) {
+          newSubItems[currentMainProductIndex] = [];
+        }
+
+        validItems.forEach(item => {
+          newSubItems[currentMainProductIndex].push({
+            ...item,
+            catalogItem: currentSubItem,
+            section: selectedSection,
+            subsection: selectedSubsection
+          });
         });
-      });
+      }
 
       setSubItems(newSubItems);
       setShowSubItemForm(false);
       setCurrentSubItem(null);
+      setEditingSubItemIndices(null);
     }
   };
 
@@ -188,6 +209,33 @@ const RecyclingCostNavigator = () => {
       delete newSubItems[mainProductIndex];
     }
     setSubItems(newSubItems);
+  };
+
+  const [editingSubItemIndices, setEditingSubItemIndices] = useState(null);
+
+  const openEditSubItem = (mainProductIndex, subItemIndex) => {
+    const subItem = subItems[mainProductIndex][subItemIndex];
+    setCurrentMainProductIndex(mainProductIndex);
+    setCurrentSubItem(subItem.catalogItem);
+    setTempSubItems([{
+      id: Date.now(),
+      productName: subItem.productName,
+      packagingType: subItem.packagingType,
+      specification: subItem.specification,
+      weight: subItem.weight
+    }]);
+    setEditingSubItemIndices({ mainIndex: mainProductIndex, subIndex: subItemIndex });
+    setShowSubItemForm(true);
+
+    // Navigate to catalog if needed
+    if (currentPage !== 'catalog') {
+      setSelectedSection(subItem.section);
+      setSelectedSubsection(subItem.subsection);
+      setBreadcrumb([
+        { name: 'Danh mục bao bì', level: 'catalog' },
+        { name: subItem.section.name, level: 'section' }
+      ]);
+    }
   };
 
   return (
@@ -213,6 +261,7 @@ const RecyclingCostNavigator = () => {
             onShowSummary={() => setShowSummary(true)}
             onDeleteMainProduct={deleteMainProduct}
             onOpenCatalog={openCatalog}
+            onEditMainProduct={editMainProduct}
           />
         )}
 
@@ -230,6 +279,8 @@ const RecyclingCostNavigator = () => {
             onSubsectionClick={handleSubsectionClick}
             onOpenSubItemForm={openSubItemForm}
             onGoHome={() => setCurrentPage('home')}
+            onEditSubItem={openEditSubItem}
+            onDeleteSubItem={deleteSubItem}
           />
         )}
       </div>
@@ -237,9 +288,13 @@ const RecyclingCostNavigator = () => {
       {showMainProductForm && (
         <MainProductForm
           currentMainProduct={currentMainProduct}
+          isEditing={editingMainProductIndex !== null}
           onProductChange={setCurrentMainProduct}
           onSave={saveMainProduct}
-          onClose={() => setShowMainProductForm(false)}
+          onClose={() => {
+            setShowMainProductForm(false);
+            setEditingMainProductIndex(null);
+          }}
         />
       )}
 
@@ -249,11 +304,15 @@ const RecyclingCostNavigator = () => {
           tempSubItems={tempSubItems}
           mainProducts={mainProducts}
           currentMainProductIndex={currentMainProductIndex}
+          isEditing={editingSubItemIndices !== null}
           onUpdateTempSubItem={updateTempSubItem}
           onAddTempSubItem={addTempSubItem}
           onRemoveTempSubItem={removeTempSubItem}
           onSave={saveSubItems}
-          onClose={() => setShowSubItemForm(false)}
+          onClose={() => {
+            setShowSubItemForm(false);
+            setEditingSubItemIndices(null);
+          }}
         />
       )}
 
@@ -263,6 +322,7 @@ const RecyclingCostNavigator = () => {
           subItems={subItems}
           onClose={() => setShowDeclaredItems(false)}
           onDeleteSubItem={deleteSubItem}
+          onEditSubItem={openEditSubItem}
         />
       )}
 

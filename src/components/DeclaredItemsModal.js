@@ -1,12 +1,13 @@
 import React from 'react';
-import { X } from 'lucide-react';
+import { X, Edit } from 'lucide-react';
 import { formatCurrency, calculateSubItemCost, getTotalSubItemsCount } from '../utils/calculations';
 
 const DeclaredItemsModal = ({
   mainProducts,
   subItems,
   onClose,
-  onDeleteSubItem
+  onDeleteSubItem,
+  onEditSubItem
 }) => {
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -66,12 +67,25 @@ const DeclaredItemsModal = ({
                               {formatCurrency(calculateSubItemCost(mainProduct, subItem))}
                             </td>
                             <td className="text-center p-3 border border-emerald-100">
-                              <button
-                                onClick={() => onDeleteSubItem(mainIndex, subIndex)}
-                                className="text-red-500 hover:text-red-700 transition-colors"
-                              >
-                                <X className="w-5 h-5" />
-                              </button>
+                              <div className="flex items-center justify-center gap-2">
+                                <button
+                                  onClick={() => {
+                                    onEditSubItem(mainIndex, subIndex);
+                                    onClose();
+                                  }}
+                                  className="text-blue-500 hover:text-blue-700 transition-colors"
+                                  title="Chỉnh sửa"
+                                >
+                                  <Edit className="w-5 h-5" />
+                                </button>
+                                <button
+                                  onClick={() => onDeleteSubItem(mainIndex, subIndex)}
+                                  className="text-red-500 hover:text-red-700 transition-colors"
+                                  title="Xóa"
+                                >
+                                  <X className="w-5 h-5" />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
